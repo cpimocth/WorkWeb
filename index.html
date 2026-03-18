@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<<<<<<< HEAD
+<html>
+<head>
+    <title>CPI Report Selection</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background: #f4f7f9; }
+        .btn { 
+            display: inline-block; padding: 20px 40px; margin: 10px; 
+            background: #0984e3; color: white; text-decoration: none; 
+            border-radius: 10px; font-weight: bold; 
+        }
+        .btn-alt { background: #2d3436; }
+    </style>
+</head>
+<body>
+    <h1>กรุณาเลือกชุดข้อมูลที่ต้องการตรวจสอบ</h1>
+    <a href="04-Excess_Lost/ชุดทั่วไป/index.html" class="btn">เปิดชุดทั่วไป</a>
+    <a href="04-Excess_Lost/ชุดนอกเขต/index.html" class="btn btn-alt">เปิดชุดนอกเขต</a>
+=======
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPI Selection - Modern Glass Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0984e3;
+            --accent: #00cec9;
+            --main: #2d3436;
+            --warning: #e17055;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            overflow: hidden;
+        }
+
+        /* --- เอฟเฟกต์พื้นหลังขยับตามเมาส์ (Parallax Shapes) --- */
+        #bg-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+        }
+        .parallax-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.15;
+            transition: transform 0.2s ease-out;
+        }
+
+        /* --- ตัวการ์ด (Static but Floating) --- */
+        .card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 3.5rem 2.5rem;
+            border-radius: 50px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 95%;
+            border: 1px solid rgba(255,255,255,0.5);
+            /* ไม่ใช้การหมุน แต่ใช้การขยายขนาดเบาๆ เวลา Hover */
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 60px 120px rgba(0,0,0,0.15);
+        }
+
+        /* --- หัวข้อใหญ่ตะโกน --- */
+        h1 { 
+            font-size: 2.5rem;
+            margin-bottom: 2.5rem;
+            color: var(--main);
+            font-weight: 300;
+            line-height: 1;
+        }
+
+        h1 b { 
+            font-size: 3.5rem; /* ใหญ่พิเศษ */
+            font-weight: 800;
+            display: block;
+            margin-top: 10px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* ปุ่มหลัก */
+        .btn { 
+            display: block;
+            padding: 20px; 
+            text-decoration: none; 
+            border-radius: 20px; 
+            font-weight: 800;
+            font-size: 1.2rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .btn-sub {
+            background: #fff;
+            color: var(--primary);
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+
+        .btn-sub:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .btn-main { 
+            background: var(--main);
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .btn-main:hover {
+            background: #000;
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+        }
+
+        /* --- ส่วนหัวข้อย่อย (เน้นใหญ่และชัด) --- */
+        .section-header {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding: 12px 20px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 15px;
+            text-align: left;
+            border-left: 8px solid var(--primary);
+        }
+
+        .section-label {
+            font-size: 1.2rem; /* ใหญ่กว่าเดิม */
+            font-weight: 800;
+            color: var(--main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .pill-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            text-decoration: none;
+            color: var(--main);
+            font-weight: 700;
+            font-size: 1rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .pill-link:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .pill-warning:hover {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(0,0,0,0.1);
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg-container">
+        <div class="parallax-shape" style="width: 500px; height: 500px; background: var(--primary); top: -10%; left: -5%;" data-speed="0.05"></div>
+        <div class="parallax-shape" style="width: 400px; height: 400px; background: var(--accent); bottom: 10%; right: 5%;" data-speed="0.08"></div>
+    </div>
+
+    <div class="card">
+        <h2>กรุณาเลือก<b>ชุดข้อมูล</b></h2>
+            <div class="section-header">
+                <div class="section-label">🔍 จำนวนการเก็บข้อมูล</div>
+            </div>        
+        
+        <div class="btn-group">
+            <a href="G/index.html" class="btn btn-sub">📊 จำนวนการเก็บข้อมูล ชุดทั่วไป</a>
+            <a href="U/index.html" class="btn btn-sub">📊 จำนวนการเก็บข้อมูล ชุดนอกเขต</a>
+            
+            <!-- <div class="divider"></div> -->
+            
+            <!-- <a href="Province_Website_CPI-main/index.html" class="btn btn-main">🌐 เข้าสู่เว็บไซต์หลัก</a>x -->
+
+            <!-- <div class="section-header">
+                <div class="section-label">🔍 ตรวจสินค้า ขาด/ครบ/เกิน</div>
+            </div> -->
+            <div class="grid-container">
+                <a href="https://docs.google.com/spreadsheets/d/17qZveTRxzFcbIVunaiwUhTOJDBXrzVI8/edit?usp=sharing&ouid=107865202541656136031&rtpof=true&sd=true" target="_blank" class="pill-link pill-warning">📦 แบบตารางรวม ชุดทั่วไป</a>
+                <a href="https://docs.google.com/spreadsheets/d/17qZveTRxzFcbIVunaiwUhTOJDBXrzVI8/edit?usp=sharing&ouid=107865202541656136031&rtpof=true&sd=true" target="_blank" class="pill-link pill-warning">📦 แบบตารางรวม ชุดนอกเขต</a>
+            </div>
+
+             <div class="divider"></div>
+            <div class="section-header">
+                <div class="section-label">📋 ราคากลาง </div>
+            </div>
+            <div class="grid-container">
+                <a href="https://docs.google.com/spreadsheets/d/1naT0wi83PqkQW48AYbKiFETRnpLVAm7ns1-KpntS8Ps/edit?usp=sharing" target="_blank" class="pill-link">📄 ชุด บ</a>
+                <a href="https://docs.google.com/spreadsheets/d/1afCIPWfh4MV5-4ajGxi07P_XqLlGE3VZszhmgjQ48hY/edit?usp=sharing" target="_blank" class="pill-link">📄 ชุด บ1</a>
+                <a href="https://docs.google.com/spreadsheets/d/1ywxoDqMeQiGv7R0daX-Hdw9elOPeRdUoBp0cgYTLst0/edit?usp=sharing" target="_blank" class="pill-link">📄 ชุด น</a>
+                <a href="https://docs.google.com/spreadsheets/d/12FFvErJvWw1JmqayED9zwf43yMFBpESmxgzw_LZTjOY/edit?gid=1203330216#gid=1203330216" target="_blank" class="pill-link">📄 ชุด อ</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ลูกเล่นพื้นหลังขยับตามเมาส์ (Parallax)
+        document.addEventListener('mousemove', (e) => {
+            const shapes = document.querySelectorAll('.parallax-shape');
+            const x = e.clientX;
+            const y = e.clientY;
+
+            shapes.forEach(shape => {
+                const speed = shape.getAttribute('data-speed');
+                const moveX = (window.innerWidth / 2 - x) * speed;
+                const moveY = (window.innerHeight / 2 - y) * speed;
+                shape.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            });
+        });
+    </script>
+>>>>>>> 92998241fa411a8c77fa411bb8316ee5a0e678e5
+</body>
+</html>
