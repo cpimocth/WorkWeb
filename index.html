@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPI Selection - Modern Glass Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>CPI Selection - Clean & Simple</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #0984e3;
-            --accent: #00cec9;
-            --main: #2d3436;
-            --warning: #e17055;
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --main-text: #2d3436;
+            --sub-text: #636e72;
+            --bg-color: #f8f9fa; /* สีนวลขาวสะอาด */
+            --border-color: #dfe6e9;
         }
 
         body { 
@@ -21,227 +21,141 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: var(--bg-gradient);
-            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--main-text);
         }
 
-        /* --- เอฟเฟกต์พื้นหลังขยับตามเมาส์ (Parallax Shapes) --- */
-        #bg-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-        }
-        .parallax-shape {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.15;
-            transition: transform 0.2s ease-out;
-        }
-
-        /* --- ตัวการ์ด (Static but Floating) --- */
         .card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            padding: 3.5rem 2.5rem;
-            border-radius: 50px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+            background: #ffffff;
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* เงาบางๆ ให้พอดูมีมิติ */
             text-align: center;
-            max-width: 500px;
-            width: 95%;
-            border: 1px solid rgba(255,255,255,0.5);
-            /* ไม่ใช้การหมุน แต่ใช้การขยายขนาดเบาๆ เวลา Hover */
-            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+            max-width: 450px;
+            width: 90%;
+            border: 1px solid var(--border-color);
         }
 
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 60px 120px rgba(0,0,0,0.15);
-        }
-
-        /* --- หัวข้อใหญ่ตะโกน --- */
-        h1 { 
-            font-size: 2.5rem;
-            margin-bottom: 2.5rem;
-            color: var(--main);
-            font-weight: 300;
-            line-height: 1;
-        }
-
-        h1 b { 
-            font-size: 3.5rem; /* ใหญ่พิเศษ */
+        h2 { 
+            font-size: 1.8rem;
+            margin: 0 0 0.5rem 0;
             font-weight: 800;
-            display: block;
-            margin-top: 10px;
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -2px;
+            color: var(--main-text);
+        }
+
+        .subtitle {
+            color: var(--sub-text);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        .section-label {
+            font-size: 1rem;
+            font-weight: 600; 
+            color: var(--primary);
+            background: rgba(9, 132, 227, 0.08);
+            padding: 4px 16px;
+            border-radius: 50px;
         }
 
         .btn-group {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
-        /* ปุ่มหลัก */
         .btn { 
             display: block;
-            padding: 20px; 
+            padding: 14px; 
             text-decoration: none; 
-            border-radius: 20px; 
-            font-weight: 800;
-            font-size: 1.2rem;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            overflow: hidden;
-            border: none;
+            border-radius: 12px; 
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--main-text);
         }
 
-        .btn-sub {
-            background: #fff;
+        .btn:hover {
+            border-color: var(--primary);
             color: var(--primary);
-            border: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-
-        .btn-sub:hover {
-            background: var(--primary);
-            color: white;
-            transform: scale(1.02);
-        }
-
-        .btn-main { 
-            background: var(--main);
-            color: white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-
-        .btn-main:hover {
-            background: #000;
-            transform: scale(1.05);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-        }
-
-        /* --- ส่วนหัวข้อย่อย (เน้นใหญ่และชัด) --- */
-        .section-header {
-            margin-top: 30px;
-            margin-bottom: 15px;
-            padding: 12px 20px;
-            background: rgba(0,0,0,0.03);
-            border-radius: 15px;
-            text-align: left;
-            border-left: 8px solid var(--primary);
-        }
-
-        .section-label {
-            font-size: 1.2rem; /* ใหญ่กว่าเดิม */
-            font-weight: 800;
-            color: var(--main);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            background: rgba(9, 132, 227, 0.02);
         }
 
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
 
         .pill-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 15px;
+            padding: 12px;
+            background: #f1f2f6;
+            border-radius: 10px;
             text-decoration: none;
-            color: var(--main);
-            font-weight: 700;
-            font-size: 1rem;
-            border: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
+            color: var(--main-text);
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.2s;
         }
 
         .pill-link:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: #fff;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        }
-
-        .pill-warning:hover {
-            border-color: var(--warning);
-            color: var(--warning);
+            background: var(--main-text);
+            color: #ffffff;
         }
 
         .divider {
             height: 1px;
-            background: rgba(0,0,0,0.1);
-            margin: 15px 0;
+            background: var(--border-color);
+            margin: 1.5rem 0;
         }
     </style>
 </head>
 <body>
 
-    <div id="bg-container">
-        <div class="parallax-shape" style="width: 500px; height: 500px; background: var(--primary); top: -10%; left: -5%;" data-speed="0.05"></div>
-        <div class="parallax-shape" style="width: 400px; height: 400px; background: var(--accent); bottom: 10%; right: 5%;" data-speed="0.08"></div>
-    </div>
-
     <div class="card">
-        <h2>กรุณาเลือก<b>ชุดข้อมูล</b></h2>
-            <div class="section-header">
-                <div class="section-label">🔍 จำนวนการเก็บข้อมูล</div>
-            </div>        
+        <h2>ระบบรายงานสถิติ</h2><h2>การจัดเก็บดัชนีราคาผู้บริโภค (CPI)</h2>
+        <div class="subtitle">เลือกชุดข้อมูลที่ต้องการตรวจสอบ</div>
         
+        <div class="divider"></div>
+
+        <div class="section-header">
+            <div class="section-label">📊 จำนวนการเก็บข้อมูล</div>
+        </div> 
+
         <div class="btn-group">
-            <a href="G/index.html" class="btn btn-sub">📊 จำนวนการเก็บข้อมูล ชุดทั่วไป</a>
-            <a href="U/index.html" class="btn btn-sub">📊 จำนวนการเก็บข้อมูล ชุดนอกเขต</a>
+            <!-- <a href="G/index.html" class="btn">ชุดข้อมูลทั่วไป</a>
+            <a href="U/index.html" class="btn">ชุดข้อมูลนอกเขต</a> -->
             
-            <!-- <div class="divider"></div> -->
-            
-            <!-- <a href="Province_Website_CPI-main/index.html" class="btn btn-main">🌐 เข้าสู่เว็บไซต์หลัก</a>x -->
-
-            <!-- <div class="section-header">
-                <div class="section-label">🔍 ตรวจสินค้า ขาด/ครบ/เกิน</div>
-            </div> -->
             <div class="grid-container">
-                <a href="https://docs.google.com/spreadsheets/d/17qZveTRxzFcbIVunaiwUhTOJDBXrzVI8/edit?usp=sharing&ouid=107865202541656136031&rtpof=true&sd=true" target="_blank" class="pill-link pill-warning">📦 แบบตารางรวม ชุดทั่วไป</a>
-                <a href="https://docs.google.com/spreadsheets/d/17qZveTRxzFcbIVunaiwUhTOJDBXrzVI8/edit?usp=sharing&ouid=107865202541656136031&rtpof=true&sd=true" target="_blank" class="pill-link pill-warning">📦 แบบตารางรวม ชุดนอกเขต</a>
+                <a href="G/index.html" class="pill-link">ชุดทั่วไป (เว็บ)</a>
+                <a href="U/index.html" class="pill-link">ชุดนอกเขต (เว็บ)</a>
+                <a href="URL_HERE" target="_blank" class="pill-link">📦 ชุดทั่วไป (ตาราง)</a>
+                <a href="URL_HERE" target="_blank" class="pill-link">📦 ชุดนอกเขต (ตาราง)</a>
             </div>
 
-             <div class="divider"></div>
+            <div class="divider"></div>
+
             <div class="section-header">
-                <div class="section-label">📋 ราคากลาง </div>
+                <div class="section-label">📋 ราคากลาง</div>
             </div>
+
             <div class="grid-container">
-                <a href="https://docs.google.com/spreadsheets/d/1naT0wi83PqkQW48AYbKiFETRnpLVAm7ns1-KpntS8Ps/edit?usp=sharing" target="_blank" class="pill-link">📄 ชุด บ</a>
-                <a href="https://docs.google.com/spreadsheets/d/1afCIPWfh4MV5-4ajGxi07P_XqLlGE3VZszhmgjQ48hY/edit?usp=sharing" target="_blank" class="pill-link">📄 ชุด บ1</a>
-                <a href="https://docs.google.com/spreadsheets/d/1ywxoDqMeQiGv7R0daX-Hdw9elOPeRdUoBp0cgYTLst0/edit?usp=sharing" target="_blank" class="pill-link">📄 ชุด น</a>
-                <a href="https://docs.google.com/spreadsheets/d/12FFvErJvWw1JmqayED9zwf43yMFBpESmxgzw_LZTjOY/edit?gid=1203330216#gid=1203330216" target="_blank" class="pill-link">📄 ชุด อ</a>
+                <a href="URL_HERE" target="_blank" class="pill-link">📄 ชุด บ</a>
+                <a href="URL_HERE" target="_blank" class="pill-link">📄 ชุด บ1</a>
+                <a href="URL_HERE" target="_blank" class="pill-link">📄 ชุด น</a>
+                <a href="URL_HERE" target="_blank" class="pill-link">📄 ชุด อ</a>
             </div>
         </div>
     </div>
 
-    <script>
-        // ลูกเล่นพื้นหลังขยับตามเมาส์ (Parallax)
-        document.addEventListener('mousemove', (e) => {
-            const shapes = document.querySelectorAll('.parallax-shape');
-            const x = e.clientX;
-            const y = e.clientY;
-
-            shapes.forEach(shape => {
-                const speed = shape.getAttribute('data-speed');
-                const moveX = (window.innerWidth / 2 - x) * speed;
-                const moveY = (window.innerHeight / 2 - y) * speed;
-                shape.style.transform = `translate(${moveX}px, ${moveY}px)`;
-            });
-        });
-    </script>
 </body>
 </html>
