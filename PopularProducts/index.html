@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>CPI Core Items Verification Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f9; height: 100vh; overflow: hidden; }
+        .wrapper { display: flex; height: 100vh; }
+        
+        /* Sidebar Style */
+        .sidebar { 
+            width: 380px; background: #001f3f; color: white; 
+            display: flex; flex-direction: column; border-right: 1px solid #ddd;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+        .sidebar-header { padding: 25px; background: #00152b; border-bottom: 2px solid #002d5a; }
+        .sidebar-menu { overflow-y: auto; flex-grow: 1; padding: 10px; background: #001f3f; }
+        
+        /* Menu Buttons */
+        .menu-item {
+            width: 100%; text-align: left; background: transparent; border: none;
+            color: #cbd5e1; padding: 14px 18px; border-radius: 8px; margin-bottom: 6px;
+            font-size: 0.95rem; transition: all 0.2s; border-left: 5px solid transparent;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .menu-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .menu-item.active { 
+            background: #0056b3; color: white; font-weight: 600;
+            border-left: 5px solid #ffcc00;
+        }
+        .code-label { font-family: monospace; font-weight: bold; color: #ffcc00; margin-right: 10px; }
+
+        /* Content Style */
+        .main-content { flex-grow: 1; overflow-y: auto; padding: 30px; background: #ffffff; }
+        .top-bar { 
+            display: flex; justify-content: space-between; align-items: flex-start; 
+            margin-bottom: 25px; padding-bottom: 20px; border-bottom: 3px solid #f1f5f9;
+        }
+        .rank-badge { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; padding: 4px 12px; border-radius: 6px; font-weight: bold; }
+        .code-pill { font-family: monospace; font-weight: bold; color: #001f3f; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; }
+        .data-stats { font-size: 0.85rem; color: #64748b; margin-top: 5px; }
+        .period-badge { background: #ffcc00; color: #00152b; padding: 2px 10px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <h5 class="mb-0 text-warning">📋 ฐานรายการสินค้าหลัก</h5>
+                <span id="displayPeriod" class="period-badge">...</span>
+            </div>
+            <p class="small text-white-50 mb-0">รายการสินค้าตัวแทน (Representative Items)</p>
+            <hr class="border-secondary">
+            <input type="text" id="menuSearch" class="form-control form-control-sm" placeholder="🔍 ค้นหารหัส หรือ ชื่อหมวดรายการ...">
+            <div class="data-stats" id="countInfo">กำลังโหลดโครงสร้างรหัส...</div>
+        </div>
+        <div class="sidebar-menu" id="sideMenu">
+            <button class="menu-item active" data-code="" data-label="ฐานข้อมูลสินค้าทั้งหมด">
+                <span>🏠 แสดงข้อมูลภาพรวมทั้งหมด</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div>
+                <h3 class="mb-1 text-dark fw-bold" id="currentCategoryTitle">ฐานข้อมูลสินค้าในตะกร้าหลัก</h3>
+                <p class="text-muted mb-0">วิเคราะห์ข้อมูลอ้างอิงรายงวดประจำปี <span id="textYear">...</span> เดือน <span id="textMonth">...</span></p>
+            </div>
+            <div style="width: 350px;">
+                <div class="input-group border rounded shadow-sm">
+                    <span class="input-group-text bg-white border-0">🔎</span>
+                    <input type="text" id="tableSearch" class="form-control border-0" placeholder="ค้นหาชื่อยี่ห้อ หรือ รายละเอียดสินค้า...">
+                </div>
+            </div>
+        </div>
+
+        <table id="productTable" class="table table-hover w-100">
+            <thead class="table-light text-secondary small text-uppercase">
+                <tr>
+                    <th width="80" class="text-center">อันดับ (Rank)</th>
+                    <th width="140">รหัสโครงสร้าง</th>
+                    <th>รายละเอียดสินค้า/คุณลักษณะ</th>
+                    <th width="120" class="text-end">จำนวนจัดเก็บ</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    const table = $('#productTable').DataTable({
+        "ajax": { "url": "PopularProducts.json", "dataSrc": "" },
+        "columns": [
+            { 
+                "data": "Rank", 
+                "className": "text-center", 
+                "render": d => `<span class="rank-badge">${d}</span>` 
+            },
+            { 
+                "data": "CODE7", 
+                "render": d => `<span class="code-pill">${d}</span>` 
+            },
+            { 
+                "data": "DESCRIPTION",
+                "render": (d, t, row) => `<div><small class="text-muted d-block" style="font-size: 0.75rem;">รหัสสินค้า: ${row.COMMODITY_CODE}</small><span class="fw-medium">${d}</span></div>`
+            },
+            { 
+                "data": "จำนวนสินค้า", 
+                "className": "text-end fw-bold text-primary",
+                "render": $.fn.dataTable.render.number(',', '.', 0)
+            }
+        ],
+        "order": [[1, 'asc'], [0, 'asc']], 
+        "dom": "rtip",
+        "pageLength": 50,
+        "language": { "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json" },
+        "initComplete": function(settings, json) {
+            // 1. อัปเดต ปี และ เดือน จากข้อมูลใน JSON (ดึงจาก Object แรก)
+            if (json.length > 0) {
+                const year = json[0].YEAR;
+                const month = json[0].MONTH;
+                $('#displayPeriod').text(`${year}/${month}`);
+                $('#textYear').text(year);
+                $('#textMonth').text(month);
+            }
+
+            // 2. สร้างเมนู Unique CODE7 + รายการ
+            const uniqueMap = {};
+            json.forEach(item => {
+                if(!uniqueMap[item.CODE7]) {
+                    uniqueMap[item.CODE7] = item.รายการ || 'หมวดทั่วไป';
+                }
+            });
+
+            const sortedCodes = Object.keys(uniqueMap).sort();
+            const sideMenu = $('#sideMenu');
+            $('#countInfo').text(`พบโครงสร้างหลัก ${sortedCodes.length} รายการ`);
+
+            sortedCodes.forEach(code => {
+                const label = uniqueMap[code];
+                sideMenu.append(`
+                    <button class="menu-item" data-code="${code}" data-label="${code} - ${label}">
+                        <span><span class="code-label">${code}</span> ${label}</span>
+                    </button>
+                `);
+            });
+
+            // 3. ระบบคลิกเลือกหมวด
+// ระบบคลิกเลือกหมวด (อัปเดต: ให้ Reset ช่องค้นหาขวามือด้วย)
+$('.menu-item').on('click', function() {
+    $('.menu-item').removeClass('active');
+    $(this).addClass('active');
+
+    const code = $(this).attr('data-code');
+    const label = $(this).attr('data-label') || 'ฐานข้อมูลสินค้าทั้งหมด';
+    
+    $('#currentCategoryTitle').text(label);
+
+    // --- ส่วนที่เพิ่มเข้ามาเพื่อ Reset ช่องค้นหาขวามือ ---
+    $('#tableSearch').val(''); // ล้างตัวหนังสือในช่อง Input
+    table.search('').draw();   // ล้างการกรองคำค้นหาหลักของตาราง
+    // ----------------------------------------------
+
+    if (code) {
+        // กรองเฉพาะ CODE7 แบบตรงตัว
+        table.column(1).search('^' + code + '$', true, false).draw();
+    } else {
+        table.column(1).search('').draw();
+    }
+});
+        }
+    });
+
+    // ค้นหาใน Sidebar
+    $('#menuSearch').on('keyup', function() {
+        const val = $(this).val().toLowerCase();
+        $('.menu-item').each(function() {
+            const text = $(this).text().toLowerCase();
+            $(this).toggle(text.indexOf(val) > -1);
+        });
+    });
+
+    // ค้นหาในตาราง
+    $('#tableSearch').on('keyup', function() {
+        table.search(this.value).draw();
+    });
+});
+</script>
+
+</body>
+</html>

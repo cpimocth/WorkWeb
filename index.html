@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,12 +11,13 @@
             --primary: #0984e3;
             --main-text: #2d3436;
             --sub-text: #636e72;
-            --bg-color: #f8f9fa; /* สีนวลขาวสะอาด */
+            --bg-color: #f8f9fa;
+            /* สีนวลขาวสะอาด */
             --border-color: #dfe6e9;
         }
 
-        body { 
-            font-family: 'Sarabun', sans-serif; 
+        body {
+            font-family: 'Sarabun', sans-serif;
             margin: 0;
             display: flex;
             justify-content: center;
@@ -29,14 +31,15 @@
             background: #ffffff;
             padding: 3rem 2rem;
             border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* เงาบางๆ ให้พอดูมีมิติ */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            /* เงาบางๆ ให้พอดูมีมิติ */
             text-align: center;
             max-width: 450px;
             width: 90%;
             border: 1px solid var(--border-color);
         }
 
-        h2 { 
+        h2 {
             font-size: 1.8rem;
             margin: 0 0 0.5rem 0;
             font-weight: 800;
@@ -58,7 +61,7 @@
 
         .section-label {
             font-size: 1rem;
-            font-weight: 600; 
+            font-weight: 600;
             color: var(--primary);
             background: rgba(9, 132, 227, 0.08);
             padding: 4px 16px;
@@ -71,11 +74,11 @@
             gap: 12px;
         }
 
-        .btn { 
+        .btn {
             display: block;
-            padding: 14px; 
-            text-decoration: none; 
-            border-radius: 12px; 
+            padding: 14px;
+            text-decoration: none;
+            border-radius: 12px;
             font-weight: 600;
             font-size: 1rem;
             transition: all 0.2s ease;
@@ -119,33 +122,39 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="card">
-        <h2>ระบบรายงานสถิติ</h2><h2>การจัดเก็บดัชนีราคาผู้บริโภค (CPI)</h2>
+        <h2>ระบบรายงานสถิติ</h2>
+        <h2>การจัดเก็บดัชนีราคาผู้บริโภค (CPI)</h2>
         <div class="subtitle">เลือกชุดข้อมูลที่ต้องการตรวจสอบ</div>
-        
+
         <div class="divider"></div>
 
         <div class="section-header">
-            <div class="section-label">📊 จำนวนการเก็บข้อมูล</div>
-        </div> 
+            <div class="section-label">ส่วนการตรวจสอบความครอบคลุมของผู้เก็บราคา</div>
+        </div>
 
         <div class="btn-group">
             <!-- <a href="G/index.html" class="btn">ชุดข้อมูลทั่วไป</a>
             <a href="U/index.html" class="btn">ชุดข้อมูลนอกเขต</a> -->
-            
-            <div class="grid-container">
-                <a href="G/index.html" class="pill-link">ชุดทั่วไป (เว็บ)</a>
-                <a href="U/index.html" class="pill-link">ชุดนอกเขต (เว็บ)</a>
-                <a href="URL_HERE" target="_blank" class="pill-link">📦 ชุดทั่วไป (ตาราง)</a>
-                <a href="URL_HERE" target="_blank" class="pill-link">📦 ชุดนอกเขต (ตาราง)</a>
-            </div>
+
+            <!-- <div class="grid-container"> -->
+                <!-- <a href="G/index.html" class="pill-link">จำนวนการเก็บข้อมูล ชุดทั่วไป (เว็บ)</a>
+                <a href="U/index.html" class="pill-link">จำนวนการเก็บข้อมูล ชุดนอกเขต (เว็บ)</a> -->
+                <!-- <a href="URL_HERE" target="_blank" class="pill-link">📦 ชุดทั่วไป (ตาราง)</a>
+                <a href="URL_HERE" target="_blank" class="pill-link">📦 ชุดนอกเขต (ตาราง)</a> -->
+                
+            <!-- </div> -->
+            <a href="G/index.html" class="pill-link">จำนวนการเก็บข้อมูล ชุดทั่วไป (เว็บ)</a>
+            <a href="U/index.html" class="pill-link">จำนวนการเก็บข้อมูล ชุดนอกเขต (เว็บ)</a>
+            <a href="PopularProducts/index.html" class="pill-link">ราคายอดนิยม (เว็บ)</a>
 
             <div class="divider"></div>
 
             <div class="section-header">
-                <div class="section-label">📋 ราคากลาง</div>
+                <div class="section-label">📋 ส่วนราคากลาง</div>
             </div>
 
             <div class="grid-container">
@@ -158,4 +167,5 @@
     </div>
 
 </body>
+
 </html>
