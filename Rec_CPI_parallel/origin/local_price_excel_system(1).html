@@ -1,0 +1,1617 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local Price Storage - Excel Export</title>
+  <style>
+    :root{
+      --blue:#1e74d6;
+      --blue-dark:#1557a6;
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --line:#dbe4f0;
+      --text:#1d2b3a;
+      --muted:#6b7b8f;
+      --danger:#d33f49;
+      --ok:#0f8f63;
+      --warn:#bf7b00;
+      --shadow:0 10px 24px rgba(25,55,90,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Tahoma, "Noto Sans Thai", Arial, sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,#eaf3ff 0,#f7f9fc 260px,#f7f9fc 100%);
+    }
+    header{
+      background:linear-gradient(120deg,var(--blue-dark),var(--blue));
+      color:#fff;
+      padding:22px 28px;
+      box-shadow:var(--shadow);
+    }
+    header h1{margin:0 0 6px 0;font-size:24px;font-weight:700}
+    header p{margin:0;color:#e4efff}
+    main{max-width:1360px;margin:22px auto;padding:0 18px 42px}
+    .topbar{
+      display:flex;gap:12px;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;margin-bottom:16px
+    }
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab-btn{
+      border:1px solid var(--line);background:#fff;color:#21415f;
+      padding:10px 14px;border-radius:999px;cursor:pointer;font-weight:700;
+      box-shadow:0 3px 10px rgba(30,70,120,.05)
+    }
+    .tab-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{
+      border:0;background:var(--blue);color:#fff;padding:10px 14px;border-radius:10px;
+      font-weight:700;cursor:pointer;box-shadow:0 4px 10px rgba(30,116,214,.16)
+    }
+    .btn:hover{background:var(--blue-dark)}
+    .btn.secondary{background:#edf4fc;color:#17476e;box-shadow:none;border:1px solid #cfe0f4}
+    .btn.danger{background:var(--danger)}
+    .btn.ok{background:var(--ok)}
+    .btn.warn{background:var(--warn)}
+    .btn.small{font-size:12px;padding:6px 9px;border-radius:8px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{
+      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+      padding:16px;box-shadow:var(--shadow)
+    }
+    .card h2{margin:0 0 12px;font-size:18px}
+    .card h3{margin:0 0 10px;font-size:15px;color:#21415f}
+    .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-5{grid-column:span 5}
+    .col-6{grid-column:span 6}.col-7{grid-column:span 7}.col-8{grid-column:span 8}.col-9{grid-column:span 9}.col-12{grid-column:span 12}
+    label{display:block;font-size:13px;font-weight:700;color:#36536f;margin-bottom:6px}
+    input,select,textarea{
+      width:100%;padding:9px 10px;border:1px solid #cbd8e8;border-radius:10px;
+      background:#fff;font:inherit;color:var(--text)
+    }
+    textarea{min-height:38px;resize:vertical}
+    input[type="checkbox"]{width:auto}
+    .form-row{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;align-items:end;margin-bottom:10px}
+    .field-2{grid-column:span 2}.field-3{grid-column:span 3}.field-4{grid-column:span 4}
+    .field-5{grid-column:span 5}.field-6{grid-column:span 6}.field-8{grid-column:span 8}.field-12{grid-column:span 12}
+    .hint{font-size:12px;color:var(--muted);line-height:1.45}
+    .notice{background:#fff8e7;border:1px solid #f0d392;color:#725209;border-radius:12px;padding:10px 12px;margin-bottom:12px}
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+    .stat .num{font-size:24px;font-weight:800;color:var(--blue-dark)}
+    .stat .label{font-size:12px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse;background:#fff}
+    th,td{border-bottom:1px solid #e4ebf4;padding:9px 8px;text-align:left;vertical-align:middle}
+    th{position:sticky;top:0;background:#f1f6fd;color:#294965;font-size:13px;z-index:1}
+    td{font-size:13px}
+    tr:hover td{background:#fbfdff}
+    .table-wrap{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:12px}
+    .money{text-align:right;white-space:nowrap}
+    .center{text-align:center}
+    .muted{color:var(--muted)}
+    .pill{display:inline-block;border-radius:999px;padding:3px 8px;font-size:12px;font-weight:700;background:#edf4fc;color:#1d5f94}
+    .pill.ok{background:#e8f8f0;color:#08734e}
+    .pill.off{background:#f0f2f5;color:#6b7580}
+    .pill.warn{background:#fff2d8;color:#8a5a00}
+    .section{display:none}
+    .section.active{display:block}
+    .checklist{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;
+      max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fbfdff
+    }
+    .check-item{
+      display:flex;gap:8px;align-items:flex-start;border:1px solid #e4ebf4;border-radius:10px;padding:8px;background:#fff
+    }
+    .check-item input{margin-top:3px}
+    .check-item b{display:block}
+    .check-item span{display:block;font-size:12px;color:var(--muted)}
+    .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+    .right{margin-left:auto}
+    .footer-note{margin-top:14px;color:var(--muted);font-size:12px}
+    .empty{padding:18px;text-align:center;color:var(--muted)}
+    .danger-text{color:var(--danger)}
+    .ok-text{color:var(--ok)}
+    .warn-text{color:var(--warn)}
+    .mini-input{min-width:90px}
+    .nowrap{white-space:nowrap}
+    @media(max-width:920px){
+      .grid,.form-row{grid-template-columns:1fr}
+      .col-3,.col-4,.col-5,.col-6,.col-7,.col-8,.col-9,.col-12,
+      .field-2,.field-3,.field-4,.field-5,.field-6,.field-8,.field-12{grid-column:span 1}
+      .stat-grid{grid-template-columns:repeat(2,1fr)}
+      .checklist{grid-template-columns:1fr}
+      header h1{font-size:20px}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>ระบบจัดเก็บราคาสินค้าแบบ Local</h1>
+  <p>บันทึกสินค้า/ห้าง/ราคาในเครื่อง คำนวณ Rel รายสินค้า เทียบราคาเปลี่ยนแปลง และส่งออกเป็น Excel ได้ทุกครั้ง</p>
+</header>
+
+<main>
+  <div class="topbar">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="entry">บันทึกราคา</button>
+      <button class="tab-btn" data-tab="products">สินค้า</button>
+      <button class="tab-btn" data-tab="stores">ห้าง/ร้าน</button>
+      <button class="tab-btn" data-tab="history">ประวัติ/คำนวณ</button>
+      <button class="tab-btn" data-tab="summary">สรุป</button>
+      <button class="tab-btn" data-tab="backup">สำรองข้อมูล</button>
+    </div>
+    <div class="actions">
+      <label style="display:flex;gap:7px;align-items:center;margin:0;font-weight:700">
+        <input id="autoExcel" type="checkbox">
+        ดาวน์โหลด Excel หลังบันทึกทุกครั้ง
+      </label>
+      <button class="btn ok" id="exportAllBtn">Export Excel ทั้งหมด</button>
+    </div>
+  </div>
+
+  <div class="stat-grid" id="statGrid"></div>
+
+  <section class="section active" id="tab-entry">
+    <div class="grid">
+      <div class="card col-4">
+        <h2>1) เลือกรอบและห้าง</h2>
+        <div class="notice">ระบบจะค้น “ราคาเดิมอัตโนมัติ” จากสินค้าเดียวกัน + ห้างเดียวกัน + วันที่ก่อนหน้า หากเว้นช่อง “ราคาเปรียบเทียบ” ว่าง ระบบจะใช้ราคาเดิมอัตโนมัติ แต่สามารถกรอกราคาเปรียบเทียบเองเป็นรายสินค้าได้</div>
+        <div class="form-row">
+          <div class="field-6">
+            <label>วันที่เก็บราคา</label>
+            <input id="entryDate" type="date">
+          </div>
+          <div class="field-6">
+            <label>ห้าง/ร้าน</label>
+            <select id="entryStore"></select>
+          </div>
+          <div class="field-6">
+            <label>ปี พ.ศ.</label>
+            <input id="entryThaiYear" type="text" readonly>
+          </div>
+          <div class="field-6">
+            <label>เดือน</label>
+            <input id="entryMonthName" type="text" readonly>
+          </div>
+        </div>
+        <div class="hint">Rel เทียบ = ราคาปัจจุบัน ÷ ราคาที่ใช้เปรียบเทียบ × 100 และ % เปลี่ยนแปลง = (ราคาปัจจุบัน - ราคาที่ใช้เปรียบเทียบ) ÷ ราคาที่ใช้เปรียบเทียบ × 100</div>
+      </div>
+
+      <div class="card col-8">
+        <h2>2) เลือกสินค้าเป็นรายการ</h2>
+        <div class="form-row">
+          <div class="field-8">
+            <label>ค้นหาสินค้า</label>
+            <input id="productSearch" type="text" placeholder="ค้นจากรหัส / ชื่อสินค้า / หมวด">
+          </div>
+          <div class="field-4">
+            <button class="btn secondary" id="selectVisibleProductsBtn" style="width:100%">ติ๊กสินค้าที่แสดง</button>
+          </div>
+        </div>
+        <div class="checklist" id="productChecklist"></div>
+        <div class="toolbar">
+          <button class="btn" id="addSelectedProductsBtn">เพิ่มรายการที่เลือก</button>
+          <button class="btn secondary" id="clearDraftBtn">ล้างรายการรอบนี้</button>
+          <span class="hint">ค่าเริ่มต้นช่อง “คำนวณ” อ้างอิงจาก master สินค้า แต่ปรับทีละรายการได้</span>
+        </div>
+      </div>
+
+      <div class="card col-12">
+        <h2>3) ใส่ราคาและบันทึก</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>รหัส</th>
+                <th>สินค้า</th>
+                <th>หมวด</th>
+                <th>หน่วย</th>
+                <th class="money">ราคาใหม่</th>
+                <th class="center">คำนวณ</th>
+                <th class="money">ราคาเดิมอัตโนมัติ</th>
+                <th class="money">ราคาเปรียบเทียบ</th>
+                <th class="money">Rel เทียบ</th>
+                <th class="money">Rel ฐาน</th>
+                <th class="money">เปลี่ยน</th>
+                <th>หมายเหตุ</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="draftBody"></tbody>
+          </table>
+        </div>
+        <div class="toolbar">
+          <button class="btn ok" id="saveBatchBtn">บันทึกราคา</button>
+          <button class="btn secondary" id="exportFilteredFromEntryBtn">Export Excel เฉพาะรายการรอบนี้</button>
+          <span class="hint" id="draftHint"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tab-products">
+    <div class="grid">
+      <div class="card col-4">
+        <h2>เพิ่ม/แก้ไขสินค้า</h2>
+        <input id="productId" type="hidden">
+        <div class="form-row">
+          <div class="field-6">
+            <label>รหัสสินค้า</label>
+            <input id="productCode" type="text" placeholder="เช่น P001">
+          </div>
+          <div class="field-6">
+            <label>หมวด</label>
+            <input id="productCategory" type="text" placeholder="เช่น อาหารสด">
+          </div>
+          <div class="field-12">
+            <label>ชื่อสินค้า</label>
+            <input id="productName" type="text" placeholder="ชื่อสินค้า">
+          </div>
+          <div class="field-6">
+            <label>หน่วย</label>
+            <input id="productUnit" type="text" placeholder="กก. / ชิ้น / ขวด">
+          </div>
+          <div class="field-6">
+            <label>ราคาฐาน</label>
+            <input id="productBasePrice" type="number" step="0.01" min="0">
+          </div>
+          <div class="field-6">
+            <label style="display:flex;gap:8px;align-items:center"><input id="productCalcDefault" type="checkbox"> คำนวณเป็นค่าเริ่มต้น</label>
+          </div>
+          <div class="field-6">
+            <label style="display:flex;gap:8px;align-items:center"><input id="productActive" type="checkbox"> เปิดใช้งาน</label>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="btn ok" id="saveProductBtn">บันทึกสินค้า</button>
+          <button class="btn secondary" id="resetProductFormBtn">ล้างฟอร์ม</button>
+        </div>
+      </div>
+      <div class="card col-8">
+        <h2>รายการสินค้า</h2>
+        <div class="toolbar">
+          <input id="productTableSearch" type="text" placeholder="ค้นหาสินค้า" style="max-width:360px">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>สถานะ</th>
+                <th>รหัส</th>
+                <th>ชื่อสินค้า</th>
+                <th>หมวด</th>
+                <th>หน่วย</th>
+                <th class="money">ราคาฐาน</th>
+                <th class="center">คำนวณ</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tab-stores">
+    <div class="grid">
+      <div class="card col-4">
+        <h2>เพิ่ม/แก้ไขห้าง</h2>
+        <input id="storeId" type="hidden">
+        <div class="form-row">
+          <div class="field-6">
+            <label>รหัสห้าง</label>
+            <input id="storeCode" type="text" placeholder="TOP / BIGC / LOTUS">
+          </div>
+          <div class="field-6">
+            <label>สาขา</label>
+            <input id="storeBranch" type="text" placeholder="เช่น พระราม 2">
+          </div>
+          <div class="field-12">
+            <label>ชื่อห้าง/ร้าน</label>
+            <input id="storeName" type="text" placeholder="Top / BigC / Lotus">
+          </div>
+          <div class="field-12">
+            <label style="display:flex;gap:8px;align-items:center"><input id="storeActive" type="checkbox"> เปิดใช้งาน</label>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="btn ok" id="saveStoreBtn">บันทึกห้าง</button>
+          <button class="btn secondary" id="resetStoreFormBtn">ล้างฟอร์ม</button>
+        </div>
+      </div>
+      <div class="card col-8">
+        <h2>รายการห้าง/ร้าน</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>สถานะ</th>
+                <th>รหัส</th>
+                <th>ชื่อ</th>
+                <th>สาขา</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="storesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tab-history">
+    <div class="card">
+      <h2>ประวัติราคา / คำนวณ Rel เฉพาะตัว</h2>
+      <div class="form-row">
+        <div class="field-2">
+          <label>ปี พ.ศ.</label>
+          <input id="histYear" type="number" placeholder="ทั้งหมด">
+        </div>
+        <div class="field-2">
+          <label>เดือน</label>
+          <select id="histMonth"></select>
+        </div>
+        <div class="field-3">
+          <label>ห้าง</label>
+          <select id="histStore"></select>
+        </div>
+        <div class="field-3">
+          <label>สินค้า</label>
+          <select id="histProduct"></select>
+        </div>
+        <div class="field-2">
+          <label>เฉพาะคำนวณ</label>
+          <select id="histCalcOnly">
+            <option value="">ทั้งหมด</option>
+            <option value="1">คำนวณเท่านั้น</option>
+            <option value="0">ไม่คำนวณเท่านั้น</option>
+          </select>
+        </div>
+        <div class="field-4">
+          <label>ค้นหา</label>
+          <input id="histSearch" type="text" placeholder="ค้นสินค้า/ห้าง/หมายเหตุ">
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="btn secondary" id="clearHistoryFilterBtn">ล้างตัวกรอง</button>
+        <button class="btn ok" id="exportFilteredBtn">Export Excel ตามตัวกรอง</button>
+        <button class="btn danger" id="deleteSelectedHistoryBtn">ลบรายการที่เลือก</button>
+        <span class="hint" id="historyHint"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="center"><input id="selectAllHistory" type="checkbox"></th>
+              <th>วันที่</th>
+              <th>ห้าง</th>
+              <th>สินค้า</th>
+              <th>หมวด</th>
+              <th class="money">ราคา</th>
+              <th class="center">คำนวณ</th>
+              <th class="money">ราคาเดิมอัตโนมัติ</th>
+              <th class="money">ราคาเปรียบเทียบ</th>
+              <th class="money">Rel เทียบ</th>
+              <th class="money">Rel ฐาน</th>
+              <th class="money">% เปลี่ยน</th>
+              <th>หมายเหตุ</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tab-summary">
+    <div class="grid">
+      <div class="card col-6">
+        <h2>สรุปตามห้าง</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ห้าง</th>
+                <th class="money">จำนวนรายการ</th>
+                <th class="money">Rel เทียบเฉลี่ย</th>
+                <th class="money">Rel ฐานเฉลี่ย</th>
+                <th class="money">% เปลี่ยนเฉลี่ย</th>
+                <th>ล่าสุด</th>
+              </tr>
+            </thead>
+            <tbody id="summaryStoreBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card col-6">
+        <h2>Rel ล่าสุดตามสินค้า/ห้าง</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>สินค้า</th>
+                <th>ห้าง</th>
+                <th>วันที่</th>
+                <th class="money">ราคา</th>
+                <th class="money">ราคาเปรียบเทียบ</th>
+                <th class="money">Rel เทียบ</th>
+                <th class="money">% เปลี่ยน</th>
+              </tr>
+            </thead>
+            <tbody id="summaryProductBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card col-12">
+        <h2>รายการที่ราคาเปลี่ยนมาก</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>วันที่</th>
+                <th>ห้าง</th>
+                <th>สินค้า</th>
+                <th class="money">ราคาเปรียบเทียบ</th>
+                <th class="money">ราคาใหม่</th>
+                <th class="money">เปลี่ยน</th>
+                <th class="money">% เปลี่ยน</th>
+              </tr>
+            </thead>
+            <tbody id="summaryChangeBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tab-backup">
+    <div class="grid">
+      <div class="card col-6">
+        <h2>สำรองข้อมูล</h2>
+        <div class="notice">ข้อมูลถูกเก็บในเครื่องนี้ผ่านเบราว์เซอร์ หากล้าง cache/local storage ข้อมูลจะหาย ควรสำรอง Excel หรือ JSON เป็นระยะ</div>
+        <div class="toolbar">
+          <button class="btn ok" id="exportExcelBackupBtn">Export Excel ทั้งหมด</button>
+          <button class="btn secondary" id="exportJsonBtn">Export JSON สำหรับนำกลับเข้า</button>
+        </div>
+        <div class="footer-note" id="storageInfo"></div>
+      </div>
+      <div class="card col-6">
+        <h2>นำเข้าข้อมูล / เริ่มใหม่</h2>
+        <label>นำเข้าไฟล์ JSON ที่เคยสำรอง</label>
+        <input id="importJsonInput" type="file" accept=".json,application/json">
+        <div class="toolbar">
+          <button class="btn warn" id="resetSampleBtn">เริ่มใหม่ด้วยข้อมูลตัวอย่าง</button>
+          <button class="btn danger" id="clearAllBtn">ลบข้อมูลทั้งหมดในเครื่อง</button>
+        </div>
+        <div class="hint">การนำเข้า JSON จะเขียนทับข้อมูลปัจจุบัน กรุณา export backup ก่อนเสมอ</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note" id="lastSavedNote"></div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  const STORAGE_KEY = "local_price_excel_system_v1";
+  const TH_MONTHS = ["","มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  const $ = (id) => document.getElementById(id);
+
+  let db = loadDb();
+  let draft = [];
+
+  function uid(prefix){
+    return prefix + "_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,8);
+  }
+
+  function todayIso(){
+    const d = new Date();
+    const offset = d.getTimezoneOffset();
+    return new Date(d.getTime() - offset * 60000).toISOString().slice(0,10);
+  }
+
+  function defaultDb(){
+    const stores = [
+      {id:uid("store"), code:"TOP", name:"Top", branch:"", active:true, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()},
+      {id:uid("store"), code:"BIGC", name:"BigC", branch:"", active:true, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()},
+      {id:uid("store"), code:"LOTUS", name:"Lotus", branch:"", active:true, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()}
+    ];
+    const products = [
+      {id:uid("prod"), code:"P001", name:"ข้าวสาร 5 กก.", category:"อาหาร", unit:"ถุง", basePrice:180, calcDefault:true, active:true, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()},
+      {id:uid("prod"), code:"P002", name:"ไข่ไก่ เบอร์ 3", category:"อาหารสด", unit:"แผง", basePrice:120, calcDefault:true, active:true, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()},
+      {id:uid("prod"), code:"P003", name:"น้ำมันพืช 1 ลิตร", category:"อาหาร", unit:"ขวด", basePrice:55, calcDefault:true, active:true, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()},
+      {id:uid("prod"), code:"P004", name:"นมสด 2 ลิตร", category:"เครื่องดื่ม", unit:"ขวด", basePrice:92, calcDefault:true, active:true, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()}
+    ];
+    return {
+      version:2,
+      createdAt:new Date().toISOString(),
+      updatedAt:new Date().toISOString(),
+      settings:{autoExcel:true},
+      products,
+      stores,
+      prices:[]
+    };
+  }
+
+  function normalizeDb(raw){
+    const base = defaultDb();
+    const out = Object.assign(base, raw || {});
+    out.settings = Object.assign({autoExcel:true}, out.settings || {});
+    out.products = Array.isArray(out.products) ? out.products : [];
+    out.stores = Array.isArray(out.stores) ? out.stores : [];
+    out.prices = Array.isArray(out.prices) ? out.prices : [];
+    out.products.forEach(p => {
+      if(!p.id) p.id = uid("prod");
+      if(typeof p.active !== "boolean") p.active = true;
+      if(typeof p.calcDefault !== "boolean") p.calcDefault = true;
+      if(!p.createdAt) p.createdAt = new Date().toISOString();
+      if(!p.updatedAt) p.updatedAt = p.createdAt;
+    });
+    out.stores.forEach(s => {
+      if(!s.id) s.id = uid("store");
+      if(typeof s.active !== "boolean") s.active = true;
+      if(!s.createdAt) s.createdAt = new Date().toISOString();
+      if(!s.updatedAt) s.updatedAt = s.createdAt;
+    });
+    out.prices.forEach(r => {
+      if(!r.id) r.id = uid("price");
+      if(typeof r.calc !== "boolean") r.calc = true;
+      const normalizedComparePrice = num(r.comparePrice);
+      r.comparePrice = normalizedComparePrice !== null && normalizedComparePrice > 0 ? normalizedComparePrice : null;
+      if(!r.createdAt) r.createdAt = new Date().toISOString();
+      if(!r.updatedAt) r.updatedAt = r.createdAt;
+    });
+    return out;
+  }
+
+  function loadDb(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return defaultDb();
+      return normalizeDb(JSON.parse(raw));
+    }catch(err){
+      console.error(err);
+      alert("อ่านข้อมูลเดิมไม่ได้ ระบบจะเริ่มฐานข้อมูลใหม่");
+      return defaultDb();
+    }
+  }
+
+  function persist(downloadExcel){
+    db.updatedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    renderStats();
+    updateLastSaved();
+    if(downloadExcel && $("autoExcel") && $("autoExcel").checked){
+      exportExcel("auto");
+    }
+  }
+
+  function escHtml(value){
+    return String(value ?? "").replace(/[&<>"']/g, ch => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[ch]));
+  }
+
+  function escXml(value){
+    return String(value ?? "").replace(/[&<>"']/g, ch => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&apos;"
+    }[ch]));
+  }
+
+  function num(value){
+    if(value === null || value === undefined || value === "") return null;
+    const n = Number(String(value).replace(/,/g,""));
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function fmtMoney(value){
+    const n = num(value);
+    return n === null ? "" : n.toLocaleString("th-TH",{minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  function fmtRel(value){
+    const n = num(value);
+    return n === null ? "" : n.toLocaleString("th-TH",{minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  function fmtPct(value){
+    const n = num(value);
+    return n === null ? "" : n.toLocaleString("th-TH",{minimumFractionDigits:2, maximumFractionDigits:2}) + "%";
+  }
+
+  function isoToThai(iso){
+    if(!iso) return "";
+    const parts = iso.split("-");
+    if(parts.length !== 3) return iso;
+    return parts[2] + "/" + parts[1] + "/" + (Number(parts[0]) + 543);
+  }
+
+  function thaiYearFromIso(iso){
+    if(!iso) return "";
+    return Number(iso.slice(0,4)) + 543;
+  }
+
+  function monthFromIso(iso){
+    if(!iso) return "";
+    return Number(iso.slice(5,7));
+  }
+
+  function getProduct(id){
+    return db.products.find(p => p.id === id);
+  }
+
+  function getStore(id){
+    return db.stores.find(s => s.id === id);
+  }
+
+  function storeLabel(store){
+    if(!store) return "ไม่พบห้าง";
+    return store.name + (store.branch ? " - " + store.branch : "");
+  }
+
+  function productLabel(product){
+    if(!product) return "ไม่พบสินค้า";
+    return (product.code ? product.code + " " : "") + product.name;
+  }
+
+  function findPreviousPrice(productId, storeId, dateIso, excludeId){
+    if(!productId || !storeId || !dateIso) return null;
+    const target = new Date(dateIso).getTime();
+    const rows = db.prices
+      .filter(r => r.productId === productId && r.storeId === storeId && r.id !== excludeId && r.calc && num(r.price) !== null)
+      .filter(r => new Date(r.date).getTime() < target)
+      .sort((a,b) => {
+        const d = new Date(b.date).getTime() - new Date(a.date).getTime();
+        if(d !== 0) return d;
+        return String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""));
+      });
+    return rows[0] || null;
+  }
+
+  function calcMetrics(record, override){
+    const product = getProduct(record.productId);
+    const price = num(override && override.price !== undefined ? override.price : record.price);
+    const date = override && override.date ? override.date : record.date;
+    const storeId = override && override.storeId ? override.storeId : record.storeId;
+    const calc = override && override.calc !== undefined ? override.calc : record.calc;
+    const prev = findPreviousPrice(record.productId, storeId, date, record.id);
+    const autoPrevPrice = prev ? num(prev.price) : null;
+    const hasOverrideCompare = !!override && Object.prototype.hasOwnProperty.call(override, "comparePrice");
+    const rawComparePrice = hasOverrideCompare ? override.comparePrice : record.comparePrice;
+    const parsedComparePrice = num(rawComparePrice);
+    const manualComparePrice = parsedComparePrice !== null && parsedComparePrice > 0 ? parsedComparePrice : null;
+    const comparePrice = manualComparePrice !== null ? manualComparePrice : autoPrevPrice;
+    const compareSource = manualComparePrice !== null ? "manual" : (autoPrevPrice !== null ? "auto" : "");
+    const basePrice = product ? num(product.basePrice) : null;
+
+    if(!calc || price === null){
+      return {
+        autoPrevPrice,
+        manualComparePrice,
+        comparePrice,
+        compareSource,
+        prevPrice:comparePrice,
+        basePrice,
+        relPrev:null,
+        relBase:null,
+        changeAmount:null,
+        changePct:null
+      };
+    }
+    const relPrev = comparePrice && comparePrice > 0 ? price / comparePrice * 100 : null;
+    const relBase = basePrice && basePrice > 0 ? price / basePrice * 100 : null;
+    const changeAmount = comparePrice !== null ? price - comparePrice : null;
+    const changePct = comparePrice && comparePrice > 0 ? (price - comparePrice) / comparePrice * 100 : null;
+    return {
+      autoPrevPrice,
+      manualComparePrice,
+      comparePrice,
+      compareSource,
+      prevPrice:comparePrice,
+      basePrice,
+      relPrev,
+      relBase,
+      changeAmount,
+      changePct
+    };
+  }
+
+  function setDefaultControls(){
+    $("entryDate").value = todayIso();
+    $("autoExcel").checked = !!db.settings.autoExcel;
+    fillMonthSelect($("histMonth"), true);
+    updateEntryDateInfo();
+  }
+
+  function fillMonthSelect(sel, includeAll){
+    sel.innerHTML = "";
+    if(includeAll){
+      const op = document.createElement("option");
+      op.value = "";
+      op.textContent = "ทั้งหมด";
+      sel.appendChild(op);
+    }
+    for(let i=1;i<=12;i++){
+      const op = document.createElement("option");
+      op.value = String(i);
+      op.textContent = TH_MONTHS[i];
+      sel.appendChild(op);
+    }
+  }
+
+  function fillSelects(){
+    const activeStores = db.stores.filter(s => s.active);
+    const allStores = db.stores.slice().sort((a,b) => storeLabel(a).localeCompare(storeLabel(b),"th"));
+    const activeProducts = db.products.filter(p => p.active);
+    const allProducts = db.products.slice().sort((a,b) => productLabel(a).localeCompare(productLabel(b),"th"));
+
+    $("entryStore").innerHTML = activeStores.map(s => `<option value="${escHtml(s.id)}">${escHtml(storeLabel(s))}</option>`).join("");
+
+    $("histStore").innerHTML = `<option value="">ทั้งหมด</option>` + allStores.map(s => `<option value="${escHtml(s.id)}">${escHtml(storeLabel(s))}</option>`).join("");
+    $("histProduct").innerHTML = `<option value="">ทั้งหมด</option>` + allProducts.map(p => `<option value="${escHtml(p.id)}">${escHtml(productLabel(p))}</option>`).join("");
+  }
+
+  function renderStats(){
+    const activeProducts = db.products.filter(p => p.active).length;
+    const activeStores = db.stores.filter(s => s.active).length;
+    const calcRows = db.prices.filter(r => r.calc);
+    const rels = calcRows.map(r => calcMetrics(r).relPrev).filter(v => v !== null);
+    const avgRel = rels.length ? rels.reduce((a,b)=>a+b,0) / rels.length : null;
+    const latest = db.prices.length ? db.prices.slice().sort((a,b)=>new Date(b.date)-new Date(a.date))[0].date : "";
+    $("statGrid").innerHTML = [
+      statCard(activeProducts, "สินค้าเปิดใช้งาน"),
+      statCard(activeStores, "ห้าง/ร้านเปิดใช้งาน"),
+      statCard(db.prices.length, "รายการราคาที่บันทึก"),
+      statCard(avgRel === null ? "-" : fmtRel(avgRel), "Rel เทียบเฉลี่ย")
+    ].join("");
+    $("storageInfo").textContent = "รายการทั้งหมด " + db.prices.length + " รายการ" + (latest ? " | วันที่ล่าสุด " + isoToThai(latest) : "");
+  }
+
+  function statCard(numText, label){
+    return `<div class="stat"><div class="num">${escHtml(numText)}</div><div class="label">${escHtml(label)}</div></div>`;
+  }
+
+  function updateLastSaved(){
+    const text = db.updatedAt ? new Date(db.updatedAt).toLocaleString("th-TH") : "-";
+    $("lastSavedNote").textContent = "บันทึกล่าสุดในเครื่อง: " + text;
+  }
+
+  function updateEntryDateInfo(){
+    const iso = $("entryDate").value;
+    $("entryThaiYear").value = iso ? thaiYearFromIso(iso) : "";
+    const m = monthFromIso(iso);
+    $("entryMonthName").value = m ? TH_MONTHS[m] : "";
+    renderDraftTable();
+  }
+
+  function renderProductChecklist(){
+    const q = $("productSearch").value.trim().toLowerCase();
+    const products = db.products
+      .filter(p => p.active)
+      .filter(p => {
+        if(!q) return true;
+        return [p.code,p.name,p.category,p.unit].some(v => String(v || "").toLowerCase().includes(q));
+      })
+      .sort((a,b) => productLabel(a).localeCompare(productLabel(b),"th"));
+
+    if(!products.length){
+      $("productChecklist").innerHTML = `<div class="empty">ไม่พบสินค้า เปิดแท็บ “สินค้า” เพื่อเพิ่มรายการ</div>`;
+      return;
+    }
+
+    $("productChecklist").innerHTML = products.map(p => `
+      <label class="check-item">
+        <input type="checkbox" data-product-select value="${escHtml(p.id)}">
+        <div>
+          <b>${escHtml(p.code || "-")} | ${escHtml(p.name)}</b>
+          <span>${escHtml(p.category || "-")} · ${escHtml(p.unit || "-")} · ฐาน ${fmtMoney(p.basePrice) || "-"}</span>
+        </div>
+      </label>
+    `).join("");
+  }
+
+  function addSelectedProducts(){
+    const selected = Array.from(document.querySelectorAll("[data-product-select]:checked")).map(el => el.value);
+    selected.forEach(productId => {
+      if(!draft.some(d => d.productId === productId)){
+        const p = getProduct(productId);
+        draft.push({productId, price:"", comparePrice:"", calc:p ? !!p.calcDefault : true, note:""});
+      }
+    });
+    renderDraftTable();
+  }
+
+  function selectVisibleProducts(){
+    document.querySelectorAll("[data-product-select]").forEach(el => el.checked = true);
+  }
+
+  function calcDraftMetrics(row){
+    return calcMetrics({id:null, productId:row.productId, storeId:$("entryStore").value, date:$("entryDate").value, price:row.price, comparePrice:row.comparePrice, calc:row.calc}, {
+      storeId:$("entryStore").value,
+      date:$("entryDate").value,
+      price:row.price,
+      comparePrice:row.comparePrice,
+      calc:row.calc
+    });
+  }
+
+  function renderDraftTable(){
+    const tbody = $("draftBody");
+    if(!tbody) return;
+    if(!draft.length){
+      tbody.innerHTML = `<tr><td colspan="13" class="empty">ยังไม่มีรายการ เลือกสินค้าแล้วกด “เพิ่มรายการที่เลือก”</td></tr>`;
+      $("draftHint").textContent = "";
+      return;
+    }
+    tbody.innerHTML = draft.map((d, i) => {
+      const p = getProduct(d.productId);
+      const m = calcDraftMetrics(d);
+      return `
+        <tr data-draft-row="${i}">
+          <td>${escHtml(p ? p.code : "-")}</td>
+          <td>${escHtml(p ? p.name : "ไม่พบสินค้า")}</td>
+          <td>${escHtml(p ? p.category || "-" : "-")}</td>
+          <td>${escHtml(p ? p.unit || "-" : "-")}</td>
+          <td class="money"><input class="mini-input" data-draft-price="${i}" type="number" min="0" step="0.01" value="${escHtml(d.price)}"></td>
+          <td class="center"><input data-draft-calc="${i}" type="checkbox" ${d.calc ? "checked" : ""}></td>
+          <td class="money" data-draft-prev="${i}">${fmtMoney(m.autoPrevPrice) || "-"}</td>
+          <td class="money"><input class="mini-input" data-draft-compare="${i}" type="number" min="0.01" step="0.01" value="${escHtml(d.comparePrice ?? "")}" placeholder="${escHtml(fmtMoney(m.autoPrevPrice) || "อัตโนมัติ")}" title="เว้นว่างเพื่อใช้ราคาเดิมอัตโนมัติ"></td>
+          <td class="money" data-draft-relprev="${i}" title="คำนวณจากราคาเปรียบเทียบที่กรอก หรือราคาเดิมอัตโนมัติเมื่อเว้นว่าง">${fmtRel(m.relPrev) || "-"}</td>
+          <td class="money" data-draft-relbase="${i}">${fmtRel(m.relBase) || "-"}</td>
+          <td class="money ${m.changePct !== null && m.changePct < 0 ? "danger-text" : "ok-text"}" data-draft-change="${i}">${fmtMoney(m.changeAmount) || "-"}</td>
+          <td><input data-draft-note="${i}" type="text" value="${escHtml(d.note || "")}" placeholder="หมายเหตุ"></td>
+          <td><button class="btn small danger" data-draft-remove="${i}">เอาออก</button></td>
+        </tr>
+      `;
+    }).join("");
+    $("draftHint").textContent = "มีรายการรอบนี้ " + draft.length + " รายการ";
+  }
+
+  function updateDraftFromElement(el){
+    const idxPrice = el.getAttribute("data-draft-price");
+    const idxCompare = el.getAttribute("data-draft-compare");
+    const idxCalc = el.getAttribute("data-draft-calc");
+    const idxNote = el.getAttribute("data-draft-note");
+    if(idxPrice !== null && draft[idxPrice]) draft[idxPrice].price = el.value;
+    if(idxCompare !== null && draft[idxCompare]) draft[idxCompare].comparePrice = el.value;
+    if(idxCalc !== null && draft[idxCalc]) draft[idxCalc].calc = el.checked;
+    if(idxNote !== null && draft[idxNote]) draft[idxNote].note = el.value;
+    const idx = idxPrice ?? idxCompare ?? idxCalc ?? idxNote;
+    if(idx !== null) updateDraftMetricCells(Number(idx));
+  }
+
+  function updateDraftMetricCells(i){
+    const d = draft[i];
+    if(!d) return;
+    const m = calcDraftMetrics(d);
+    const prev = document.querySelector(`[data-draft-prev="${i}"]`);
+    const relp = document.querySelector(`[data-draft-relprev="${i}"]`);
+    const relb = document.querySelector(`[data-draft-relbase="${i}"]`);
+    const chg = document.querySelector(`[data-draft-change="${i}"]`);
+    if(prev) prev.textContent = fmtMoney(m.autoPrevPrice) || "-";
+    if(relp) relp.textContent = fmtRel(m.relPrev) || "-";
+    if(relb) relb.textContent = fmtRel(m.relBase) || "-";
+    if(chg){
+      chg.textContent = fmtMoney(m.changeAmount) || "-";
+      chg.classList.toggle("danger-text", m.changePct !== null && m.changePct < 0);
+      chg.classList.toggle("ok-text", m.changePct !== null && m.changePct >= 0);
+    }
+  }
+
+  function saveBatch(){
+    const storeId = $("entryStore").value;
+    const date = $("entryDate").value;
+    if(!date){ alert("กรุณาเลือกวันที่"); return; }
+    if(!storeId){ alert("กรุณาเลือกห้าง/ร้าน"); return; }
+
+    document.querySelectorAll("[data-draft-price],[data-draft-compare],[data-draft-calc],[data-draft-note]").forEach(updateDraftFromElement);
+
+    const invalidCompareRow = draft.find(d => {
+      const raw = String(d.comparePrice ?? "").trim();
+      if(!raw) return false;
+      const value = num(raw);
+      return value === null || value <= 0;
+    });
+    if(invalidCompareRow){
+      const product = getProduct(invalidCompareRow.productId);
+      alert("ราคาเปรียบเทียบของ " + productLabel(product) + " ต้องมากกว่า 0 หรือเว้นว่างเพื่อใช้ราคาเดิมอัตโนมัติ");
+      return;
+    }
+
+    let saved = 0;
+    draft.forEach(d => {
+      const price = num(d.price);
+      if(price === null) return;
+      const compareRaw = String(d.comparePrice ?? "").trim();
+      const comparePrice = compareRaw ? num(compareRaw) : null;
+      const existing = db.prices.find(r => r.date === date && r.storeId === storeId && r.productId === d.productId);
+      if(existing){
+        existing.price = price;
+        existing.comparePrice = comparePrice;
+        existing.calc = !!d.calc;
+        existing.note = d.note || "";
+        existing.updatedAt = new Date().toISOString();
+      }else{
+        db.prices.push({
+          id:uid("price"),
+          date,
+          thaiYear:thaiYearFromIso(date),
+          month:monthFromIso(date),
+          storeId,
+          productId:d.productId,
+          price,
+          comparePrice,
+          calc:!!d.calc,
+          note:d.note || "",
+          createdAt:new Date().toISOString(),
+          updatedAt:new Date().toISOString()
+        });
+      }
+      saved++;
+    });
+
+    if(!saved){ alert("ยังไม่มีราคาที่บันทึกได้"); return; }
+    persist(true);
+    renderAll();
+    alert("บันทึกราคาแล้ว " + saved + " รายการ");
+  }
+
+  function exportDraftOnly(){
+    const storeId = $("entryStore").value;
+    const date = $("entryDate").value;
+    const rows = draft
+      .map(d => ({id:null, date, thaiYear:thaiYearFromIso(date), month:monthFromIso(date), storeId, productId:d.productId, price:num(d.price), comparePrice:String(d.comparePrice ?? "").trim() ? num(d.comparePrice) : null, calc:!!d.calc, note:d.note || "", createdAt:"", updatedAt:""}))
+      .filter(r => r.price !== null);
+    if(!rows.length){ alert("ไม่มีรายการรอบนี้ให้ Export"); return; }
+    exportExcel("draft", rows);
+  }
+
+  function resetProductForm(){
+    $("productId").value = "";
+    $("productCode").value = "";
+    $("productName").value = "";
+    $("productCategory").value = "";
+    $("productUnit").value = "";
+    $("productBasePrice").value = "";
+    $("productCalcDefault").checked = true;
+    $("productActive").checked = true;
+  }
+
+  function saveProduct(){
+    const id = $("productId").value;
+    const code = $("productCode").value.trim();
+    const name = $("productName").value.trim();
+    if(!name){ alert("กรุณาระบุชื่อสินค้า"); return; }
+    const data = {
+      code,
+      name,
+      category:$("productCategory").value.trim(),
+      unit:$("productUnit").value.trim(),
+      basePrice:num($("productBasePrice").value),
+      calcDefault:$("productCalcDefault").checked,
+      active:$("productActive").checked
+    };
+    if(id){
+      const p = getProduct(id);
+      if(p) Object.assign(p, data, {updatedAt:new Date().toISOString()});
+    }else{
+      db.products.push(Object.assign({id:uid("prod"), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()}, data));
+    }
+    persist(true);
+    resetProductForm();
+    renderAll();
+  }
+
+  function editProduct(id){
+    const p = getProduct(id);
+    if(!p) return;
+    $("productId").value = p.id;
+    $("productCode").value = p.code || "";
+    $("productName").value = p.name || "";
+    $("productCategory").value = p.category || "";
+    $("productUnit").value = p.unit || "";
+    $("productBasePrice").value = p.basePrice ?? "";
+    $("productCalcDefault").checked = !!p.calcDefault;
+    $("productActive").checked = !!p.active;
+    showTab("products");
+  }
+
+  function deleteProduct(id){
+    const used = db.prices.some(r => r.productId === id);
+    const p = getProduct(id);
+    if(!p) return;
+    if(used){
+      if(confirm("สินค้านี้มีประวัติราคาแล้ว จะปิดใช้งานแทนการลบ เพื่อไม่ให้ประวัติหาย ต้องการทำต่อหรือไม่?")){
+        p.active = false;
+        p.updatedAt = new Date().toISOString();
+      }else return;
+    }else{
+      if(confirm("ลบสินค้านี้ออกจากระบบ?")){
+        db.products = db.products.filter(x => x.id !== id);
+      }else return;
+    }
+    persist(true);
+    renderAll();
+  }
+
+  function renderProductsTable(){
+    const q = $("productTableSearch").value.trim().toLowerCase();
+    const rows = db.products
+      .filter(p => !q || [p.code,p.name,p.category,p.unit].some(v => String(v || "").toLowerCase().includes(q)))
+      .sort((a,b) => productLabel(a).localeCompare(productLabel(b),"th"));
+    $("productsBody").innerHTML = rows.length ? rows.map(p => `
+      <tr>
+        <td>${p.active ? '<span class="pill ok">เปิด</span>' : '<span class="pill off">ปิด</span>'}</td>
+        <td>${escHtml(p.code || "-")}</td>
+        <td>${escHtml(p.name || "-")}</td>
+        <td>${escHtml(p.category || "-")}</td>
+        <td>${escHtml(p.unit || "-")}</td>
+        <td class="money">${fmtMoney(p.basePrice) || "-"}</td>
+        <td class="center">${p.calcDefault ? "✓" : "-"}</td>
+        <td class="nowrap">
+          <button class="btn small secondary" data-edit-product="${escHtml(p.id)}">แก้ไข</button>
+          <button class="btn small danger" data-delete-product="${escHtml(p.id)}">เอาออก</button>
+        </td>
+      </tr>
+    `).join("") : `<tr><td colspan="8" class="empty">ยังไม่มีสินค้า</td></tr>`;
+  }
+
+  function resetStoreForm(){
+    $("storeId").value = "";
+    $("storeCode").value = "";
+    $("storeName").value = "";
+    $("storeBranch").value = "";
+    $("storeActive").checked = true;
+  }
+
+  function saveStore(){
+    const id = $("storeId").value;
+    const code = $("storeCode").value.trim();
+    const name = $("storeName").value.trim();
+    if(!name){ alert("กรุณาระบุชื่อห้าง/ร้าน"); return; }
+    const data = {
+      code,
+      name,
+      branch:$("storeBranch").value.trim(),
+      active:$("storeActive").checked
+    };
+    if(id){
+      const s = getStore(id);
+      if(s) Object.assign(s, data, {updatedAt:new Date().toISOString()});
+    }else{
+      db.stores.push(Object.assign({id:uid("store"), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()}, data));
+    }
+    persist(true);
+    resetStoreForm();
+    renderAll();
+  }
+
+  function editStore(id){
+    const s = getStore(id);
+    if(!s) return;
+    $("storeId").value = s.id;
+    $("storeCode").value = s.code || "";
+    $("storeName").value = s.name || "";
+    $("storeBranch").value = s.branch || "";
+    $("storeActive").checked = !!s.active;
+    showTab("stores");
+  }
+
+  function deleteStore(id){
+    const used = db.prices.some(r => r.storeId === id);
+    const s = getStore(id);
+    if(!s) return;
+    if(used){
+      if(confirm("ห้างนี้มีประวัติราคาแล้ว จะปิดใช้งานแทนการลบ เพื่อไม่ให้ประวัติหาย ต้องการทำต่อหรือไม่?")){
+        s.active = false;
+        s.updatedAt = new Date().toISOString();
+      }else return;
+    }else{
+      if(confirm("ลบห้างนี้ออกจากระบบ?")){
+        db.stores = db.stores.filter(x => x.id !== id);
+      }else return;
+    }
+    persist(true);
+    renderAll();
+  }
+
+  function renderStoresTable(){
+    const rows = db.stores.slice().sort((a,b) => storeLabel(a).localeCompare(storeLabel(b),"th"));
+    $("storesBody").innerHTML = rows.length ? rows.map(s => `
+      <tr>
+        <td>${s.active ? '<span class="pill ok">เปิด</span>' : '<span class="pill off">ปิด</span>'}</td>
+        <td>${escHtml(s.code || "-")}</td>
+        <td>${escHtml(s.name || "-")}</td>
+        <td>${escHtml(s.branch || "-")}</td>
+        <td class="nowrap">
+          <button class="btn small secondary" data-edit-store="${escHtml(s.id)}">แก้ไข</button>
+          <button class="btn small danger" data-delete-store="${escHtml(s.id)}">เอาออก</button>
+        </td>
+      </tr>
+    `).join("") : `<tr><td colspan="5" class="empty">ยังไม่มีห้าง</td></tr>`;
+  }
+
+  function getFilteredHistory(){
+    const y = $("histYear").value.trim();
+    const m = $("histMonth").value;
+    const storeId = $("histStore").value;
+    const productId = $("histProduct").value;
+    const calcOnly = $("histCalcOnly").value;
+    const q = $("histSearch").value.trim().toLowerCase();
+
+    return db.prices.filter(r => {
+      const p = getProduct(r.productId);
+      const s = getStore(r.storeId);
+      if(y && String(thaiYearFromIso(r.date)) !== y) return false;
+      if(m && String(monthFromIso(r.date)) !== m) return false;
+      if(storeId && r.storeId !== storeId) return false;
+      if(productId && r.productId !== productId) return false;
+      if(calcOnly === "1" && !r.calc) return false;
+      if(calcOnly === "0" && r.calc) return false;
+      if(q){
+        const hay = [p && p.code, p && p.name, p && p.category, s && s.code, s && s.name, s && s.branch, r.note].join(" ").toLowerCase();
+        if(!hay.includes(q)) return false;
+      }
+      return true;
+    }).sort((a,b) => {
+      const d = new Date(b.date).getTime() - new Date(a.date).getTime();
+      if(d !== 0) return d;
+      return productLabel(getProduct(a.productId)).localeCompare(productLabel(getProduct(b.productId)),"th");
+    });
+  }
+
+  function renderHistory(){
+    const rows = getFilteredHistory();
+    $("historyHint").textContent = "พบ " + rows.length + " รายการ";
+    $("historyBody").innerHTML = rows.length ? rows.map(r => {
+      const p = getProduct(r.productId);
+      const s = getStore(r.storeId);
+      const m = calcMetrics(r);
+      return `
+        <tr>
+          <td class="center"><input type="checkbox" data-history-select value="${escHtml(r.id)}"></td>
+          <td>${isoToThai(r.date)}</td>
+          <td>${escHtml(storeLabel(s))}</td>
+          <td>${escHtml(productLabel(p))}</td>
+          <td>${escHtml(p ? p.category || "-" : "-")}</td>
+          <td class="money"><input type="number" step="0.01" min="0" value="${escHtml(r.price)}" data-history-price="${escHtml(r.id)}" style="min-width:96px"></td>
+          <td class="center"><input type="checkbox" ${r.calc ? "checked" : ""} data-history-calc="${escHtml(r.id)}"></td>
+          <td class="money">${fmtMoney(m.autoPrevPrice) || "-"}</td>
+          <td class="money"><input type="number" step="0.01" min="0.01" value="${escHtml(r.comparePrice ?? "")}" placeholder="${escHtml(fmtMoney(m.autoPrevPrice) || "อัตโนมัติ")}" title="เว้นว่างเพื่อใช้ราคาเดิมอัตโนมัติ" data-history-compare="${escHtml(r.id)}" style="min-width:108px"></td>
+          <td class="money">${fmtRel(m.relPrev) || "-"}</td>
+          <td class="money">${fmtRel(m.relBase) || "-"}</td>
+          <td class="money ${m.changePct !== null && m.changePct < 0 ? "danger-text" : "ok-text"}">${fmtPct(m.changePct) || "-"}</td>
+          <td><input type="text" value="${escHtml(r.note || "")}" data-history-note="${escHtml(r.id)}"></td>
+          <td class="nowrap">
+            <button class="btn small ok" data-save-history="${escHtml(r.id)}">บันทึก</button>
+            <button class="btn small danger" data-delete-history="${escHtml(r.id)}">ลบ</button>
+          </td>
+        </tr>
+      `;
+    }).join("") : `<tr><td colspan="14" class="empty">ไม่พบประวัติตามเงื่อนไข</td></tr>`;
+  }
+
+  function saveHistoryRow(id){
+    const r = db.prices.find(x => x.id === id);
+    if(!r) return;
+    const priceEl = document.querySelector(`[data-history-price="${CSS.escape(id)}"]`);
+    const compareEl = document.querySelector(`[data-history-compare="${CSS.escape(id)}"]`);
+    const calcEl = document.querySelector(`[data-history-calc="${CSS.escape(id)}"]`);
+    const noteEl = document.querySelector(`[data-history-note="${CSS.escape(id)}"]`);
+    const price = num(priceEl ? priceEl.value : r.price);
+    if(price === null){ alert("ราคาต้องเป็นตัวเลข"); return; }
+    const compareRaw = compareEl ? compareEl.value.trim() : "";
+    const comparePrice = compareRaw ? num(compareRaw) : null;
+    if(compareRaw && (comparePrice === null || comparePrice <= 0)){
+      alert("ราคาเปรียบเทียบต้องมากกว่า 0 หรือเว้นว่างเพื่อใช้ราคาเดิมอัตโนมัติ");
+      return;
+    }
+    r.price = price;
+    r.comparePrice = comparePrice;
+    r.calc = !!(calcEl && calcEl.checked);
+    r.note = noteEl ? noteEl.value : "";
+    r.updatedAt = new Date().toISOString();
+    persist(true);
+    renderAll();
+  }
+
+  function deleteHistoryRow(id){
+    if(!confirm("ลบรายการราคานี้?")) return;
+    db.prices = db.prices.filter(r => r.id !== id);
+    persist(true);
+    renderAll();
+  }
+
+  function deleteSelectedHistory(){
+    const ids = Array.from(document.querySelectorAll("[data-history-select]:checked")).map(el => el.value);
+    if(!ids.length){ alert("กรุณาเลือกรายการที่จะลบ"); return; }
+    if(!confirm("ลบรายการที่เลือก " + ids.length + " รายการ?")) return;
+    const set = new Set(ids);
+    db.prices = db.prices.filter(r => !set.has(r.id));
+    persist(true);
+    renderAll();
+  }
+
+  function clearHistoryFilter(){
+    $("histYear").value = "";
+    $("histMonth").value = "";
+    $("histStore").value = "";
+    $("histProduct").value = "";
+    $("histCalcOnly").value = "";
+    $("histSearch").value = "";
+    renderHistory();
+    renderSummary();
+  }
+
+  function summarizeRows(rows){
+    const usable = rows.filter(r => r.calc);
+    const byStore = new Map();
+    usable.forEach(r => {
+      const s = getStore(r.storeId);
+      const key = r.storeId || "unknown";
+      if(!byStore.has(key)) byStore.set(key, {name:storeLabel(s), count:0, relPrev:[], relBase:[], changePct:[], latest:""});
+      const g = byStore.get(key);
+      const m = calcMetrics(r);
+      g.count++;
+      if(m.relPrev !== null) g.relPrev.push(m.relPrev);
+      if(m.relBase !== null) g.relBase.push(m.relBase);
+      if(m.changePct !== null) g.changePct.push(m.changePct);
+      if(!g.latest || new Date(r.date) > new Date(g.latest)) g.latest = r.date;
+    });
+    return Array.from(byStore.values()).sort((a,b)=>a.name.localeCompare(b.name,"th"));
+  }
+
+  function avg(arr){
+    return arr.length ? arr.reduce((a,b)=>a+b,0) / arr.length : null;
+  }
+
+  function renderSummary(){
+    const rows = getFilteredHistory ? getFilteredHistory() : db.prices;
+    const storeSummary = summarizeRows(rows);
+    $("summaryStoreBody").innerHTML = storeSummary.length ? storeSummary.map(g => `
+      <tr>
+        <td>${escHtml(g.name)}</td>
+        <td class="money">${g.count}</td>
+        <td class="money">${fmtRel(avg(g.relPrev)) || "-"}</td>
+        <td class="money">${fmtRel(avg(g.relBase)) || "-"}</td>
+        <td class="money">${fmtPct(avg(g.changePct)) || "-"}</td>
+        <td>${isoToThai(g.latest)}</td>
+      </tr>
+    `).join("") : `<tr><td colspan="6" class="empty">ยังไม่มีข้อมูลคำนวณ</td></tr>`;
+
+    const latestMap = new Map();
+    rows.filter(r => r.calc).forEach(r => {
+      const key = r.productId + "|" + r.storeId;
+      if(!latestMap.has(key) || new Date(r.date) > new Date(latestMap.get(key).date)){
+        latestMap.set(key, r);
+      }
+    });
+    const latestRows = Array.from(latestMap.values()).sort((a,b)=>productLabel(getProduct(a.productId)).localeCompare(productLabel(getProduct(b.productId)),"th"));
+    $("summaryProductBody").innerHTML = latestRows.length ? latestRows.map(r => {
+      const p = getProduct(r.productId), s = getStore(r.storeId), m = calcMetrics(r);
+      return `
+        <tr>
+          <td>${escHtml(productLabel(p))}</td>
+          <td>${escHtml(storeLabel(s))}</td>
+          <td>${isoToThai(r.date)}</td>
+          <td class="money">${fmtMoney(r.price)}</td>
+          <td class="money">${fmtMoney(m.comparePrice) || "-"}</td>
+          <td class="money">${fmtRel(m.relPrev) || "-"}</td>
+          <td class="money ${m.changePct !== null && m.changePct < 0 ? "danger-text" : "ok-text"}">${fmtPct(m.changePct) || "-"}</td>
+        </tr>
+      `;
+    }).join("") : `<tr><td colspan="7" class="empty">ยังไม่มีข้อมูลล่าสุด</td></tr>`;
+
+    const changeRows = rows.filter(r => r.calc)
+      .map(r => ({r, m:calcMetrics(r)}))
+      .filter(x => x.m.changePct !== null)
+      .sort((a,b) => Math.abs(b.m.changePct) - Math.abs(a.m.changePct))
+      .slice(0,100);
+    $("summaryChangeBody").innerHTML = changeRows.length ? changeRows.map(x => {
+      const p = getProduct(x.r.productId), s = getStore(x.r.storeId);
+      return `
+        <tr>
+          <td>${isoToThai(x.r.date)}</td>
+          <td>${escHtml(storeLabel(s))}</td>
+          <td>${escHtml(productLabel(p))}</td>
+          <td class="money">${fmtMoney(x.m.comparePrice)}</td>
+          <td class="money">${fmtMoney(x.r.price)}</td>
+          <td class="money ${x.m.changeAmount < 0 ? "danger-text" : "ok-text"}">${fmtMoney(x.m.changeAmount)}</td>
+          <td class="money ${x.m.changePct < 0 ? "danger-text" : "ok-text"}">${fmtPct(x.m.changePct)}</td>
+        </tr>
+      `;
+    }).join("") : `<tr><td colspan="7" class="empty">ยังไม่มีรายการที่มีราคาเปรียบเทียบ</td></tr>`;
+  }
+
+  function xmlCell(value, style){
+    let type = "String";
+    let text = value ?? "";
+    if(typeof value === "number" && Number.isFinite(value)){
+      type = "Number";
+      text = String(value);
+    }
+    return `<Cell${style ? ` ss:StyleID="${style}"` : ""}><Data ss:Type="${type}">${escXml(text)}</Data></Cell>`;
+  }
+
+  function xmlRow(values, style){
+    return "<Row>" + values.map(v => xmlCell(v, style)).join("") + "</Row>";
+  }
+
+  function sheetXml(name, rows){
+    const safeName = String(name).replace(/[\[\]\*\/\\\?\:]/g," ").slice(0,31);
+    return `<Worksheet ss:Name="${escXml(safeName)}"><Table>${rows.join("")}</Table></Worksheet>`;
+  }
+
+  function priceExportRows(rows){
+    const header = ["วันที่","ปี พ.ศ.","เดือน","รหัสห้าง","ห้าง","สาขา","รหัสสินค้า","สินค้า","หมวด","หน่วย","ราคา","คำนวณ","ราคาฐาน","ราคาเดิมอัตโนมัติ","ราคาเปรียบเทียบที่กรอก","ราคาที่ใช้เปรียบเทียบ","แหล่งราคาเปรียบเทียบ","Rel เทียบ","Rel ฐาน","เปลี่ยนบาท","% เปลี่ยน","หมายเหตุ","สร้างเมื่อ","แก้ไขเมื่อ"];
+    const out = [xmlRow(header, "Header")];
+    rows.forEach(r => {
+      const p = getProduct(r.productId);
+      const s = getStore(r.storeId);
+      const m = calcMetrics(r);
+      out.push(xmlRow([
+        isoToThai(r.date),
+        thaiYearFromIso(r.date),
+        TH_MONTHS[monthFromIso(r.date)] || "",
+        s ? s.code || "" : "",
+        s ? s.name || "" : "",
+        s ? s.branch || "" : "",
+        p ? p.code || "" : "",
+        p ? p.name || "" : "",
+        p ? p.category || "" : "",
+        p ? p.unit || "" : "",
+        num(r.price),
+        r.calc ? "Y" : "N",
+        m.basePrice,
+        m.autoPrevPrice,
+        m.manualComparePrice,
+        m.comparePrice,
+        m.compareSource === "manual" ? "กรอกเอง" : (m.compareSource === "auto" ? "ราคาเดิมอัตโนมัติ" : ""),
+        m.relPrev,
+        m.relBase,
+        m.changeAmount,
+        m.changePct,
+        r.note || "",
+        r.createdAt ? new Date(r.createdAt).toLocaleString("th-TH") : "",
+        r.updatedAt ? new Date(r.updatedAt).toLocaleString("th-TH") : ""
+      ]));
+    });
+    return out;
+  }
+
+  function productExportRows(){
+    const header = ["รหัสสินค้า","สินค้า","หมวด","หน่วย","ราคาฐาน","คำนวณค่าเริ่มต้น","เปิดใช้งาน","สร้างเมื่อ","แก้ไขเมื่อ"];
+    const out = [xmlRow(header, "Header")];
+    db.products.forEach(p => out.push(xmlRow([p.code || "", p.name || "", p.category || "", p.unit || "", num(p.basePrice), p.calcDefault ? "Y" : "N", p.active ? "Y" : "N", p.createdAt || "", p.updatedAt || ""])));
+    return out;
+  }
+
+  function storeExportRows(){
+    const header = ["รหัสห้าง","ชื่อห้าง","สาขา","เปิดใช้งาน","สร้างเมื่อ","แก้ไขเมื่อ"];
+    const out = [xmlRow(header, "Header")];
+    db.stores.forEach(s => out.push(xmlRow([s.code || "", s.name || "", s.branch || "", s.active ? "Y" : "N", s.createdAt || "", s.updatedAt || ""])));
+    return out;
+  }
+
+  function summaryStoreExportRows(rows){
+    const out = [xmlRow(["ห้าง","จำนวนรายการ","Rel เทียบเฉลี่ย","Rel ฐานเฉลี่ย","% เปลี่ยนเฉลี่ย","วันที่ล่าสุด"], "Header")];
+    summarizeRows(rows).forEach(g => out.push(xmlRow([g.name, g.count, avg(g.relPrev), avg(g.relBase), avg(g.changePct), isoToThai(g.latest)])));
+    return out;
+  }
+
+  function latestProductExportRows(rows){
+    const out = [xmlRow(["สินค้า","ห้าง","วันที่","ราคา","ราคาเปรียบเทียบ","Rel เทียบ","% เปลี่ยน"], "Header")];
+    const latestMap = new Map();
+    rows.filter(r => r.calc).forEach(r => {
+      const key = r.productId + "|" + r.storeId;
+      if(!latestMap.has(key) || new Date(r.date) > new Date(latestMap.get(key).date)) latestMap.set(key, r);
+    });
+    Array.from(latestMap.values()).forEach(r => {
+      const p = getProduct(r.productId), s = getStore(r.storeId), m = calcMetrics(r);
+      out.push(xmlRow([productLabel(p), storeLabel(s), isoToThai(r.date), num(r.price), m.comparePrice, m.relPrev, m.changePct]));
+    });
+    return out;
+  }
+
+  function buildExcelXml(rows){
+    const sheets = [
+      sheetXml("PriceData", priceExportRows(rows)),
+      sheetXml("Products", productExportRows()),
+      sheetXml("Stores", storeExportRows()),
+      sheetXml("Summary_Store", summaryStoreExportRows(rows)),
+      sheetXml("Summary_Product", latestProductExportRows(rows)),
+      sheetXml("Settings", [
+        xmlRow(["รายการ","ค่า"], "Header"),
+        xmlRow(["Export เมื่อ", new Date().toLocaleString("th-TH")]),
+        xmlRow(["จำนวนราคาที่ Export", rows.length]),
+        xmlRow(["จำนวนสินค้า", db.products.length]),
+        xmlRow(["จำนวนห้าง", db.stores.length]),
+        xmlRow(["หมายเหตุ", "ไฟล์นี้สร้างจากระบบจัดเก็บราคาสินค้าแบบ Local"])
+      ])
+    ].join("");
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/><Font ss:FontName="Tahoma" ss:Size="10"/></Style>
+  <Style ss:ID="Header"><Font ss:FontName="Tahoma" ss:Size="10" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#1E74D6" ss:Pattern="Solid"/><Alignment ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style>
+ </Styles>
+ ${sheets}
+</Workbook>`;
+  }
+
+  function fileStamp(){
+    const d = new Date();
+    const pad = n => String(n).padStart(2,"0");
+    return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + "_" + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+  }
+
+  function downloadFile(content, filename, type){
+    const blob = new Blob([content], {type});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      a.remove();
+    }, 0);
+  }
+
+  function exportExcel(mode, customRows){
+    let rows = customRows || db.prices.slice();
+    if(mode === "filtered") rows = getFilteredHistory();
+    const prefix = mode === "filtered" ? "filtered" : mode === "draft" ? "draft" : mode === "auto" ? "auto" : "all";
+    const xml = buildExcelXml(rows);
+    downloadFile(xml, "price_local_" + prefix + "_" + fileStamp() + ".xls", "application/vnd.ms-excel;charset=utf-8");
+  }
+
+  function exportJson(){
+    downloadFile(JSON.stringify(db, null, 2), "price_local_backup_" + fileStamp() + ".json", "application/json;charset=utf-8");
+  }
+
+  function importJson(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const data = normalizeDb(JSON.parse(reader.result));
+        if(!confirm("นำเข้าข้อมูลนี้และเขียนทับข้อมูลปัจจุบัน?")) return;
+        db = data;
+        persist(false);
+        renderAll();
+        alert("นำเข้าข้อมูลสำเร็จ");
+      }catch(err){
+        alert("นำเข้าไฟล์ JSON ไม่สำเร็จ: " + err.message);
+      }
+    };
+    reader.readAsText(file, "utf-8");
+  }
+
+  function resetSample(){
+    if(!confirm("เริ่มใหม่ด้วยข้อมูลตัวอย่าง? ข้อมูลปัจจุบันจะถูกเขียนทับ")) return;
+    db = defaultDb();
+    draft = [];
+    persist(false);
+    renderAll();
+  }
+
+  function clearAll(){
+    if(!confirm("ลบข้อมูลทั้งหมดในเครื่องนี้? ควร Export backup ก่อน")) return;
+    db = {version:2, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), settings:{autoExcel:true}, products:[], stores:[], prices:[]};
+    draft = [];
+    persist(false);
+    renderAll();
+  }
+
+  function showTab(name){
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === name));
+    document.querySelectorAll(".section").forEach(sec => sec.classList.toggle("active", sec.id === "tab-" + name));
+    if(name === "summary") renderSummary();
+    if(name === "history") renderHistory();
+  }
+
+  function renderAll(){
+    fillSelects();
+    renderProductChecklist();
+    renderDraftTable();
+    renderProductsTable();
+    renderStoresTable();
+    renderHistory();
+    renderSummary();
+    renderStats();
+    updateLastSaved();
+    $("autoExcel").checked = !!db.settings.autoExcel;
+  }
+
+  function bindEvents(){
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.addEventListener("click", () => showTab(btn.dataset.tab)));
+    $("exportAllBtn").addEventListener("click", () => exportExcel("all"));
+    $("exportExcelBackupBtn").addEventListener("click", () => exportExcel("all"));
+    $("exportJsonBtn").addEventListener("click", exportJson);
+    $("autoExcel").addEventListener("change", () => { db.settings.autoExcel = $("autoExcel").checked; persist(false); });
+
+    $("entryDate").addEventListener("change", updateEntryDateInfo);
+    $("entryStore").addEventListener("change", renderDraftTable);
+    $("productSearch").addEventListener("input", renderProductChecklist);
+    $("selectVisibleProductsBtn").addEventListener("click", selectVisibleProducts);
+    $("addSelectedProductsBtn").addEventListener("click", addSelectedProducts);
+    $("clearDraftBtn").addEventListener("click", () => { draft = []; renderDraftTable(); });
+    $("saveBatchBtn").addEventListener("click", saveBatch);
+    $("exportFilteredFromEntryBtn").addEventListener("click", exportDraftOnly);
+
+    $("draftBody").addEventListener("input", e => updateDraftFromElement(e.target));
+    $("draftBody").addEventListener("change", e => updateDraftFromElement(e.target));
+    $("draftBody").addEventListener("click", e => {
+      const idx = e.target.getAttribute("data-draft-remove");
+      if(idx !== null){
+        draft.splice(Number(idx),1);
+        renderDraftTable();
+      }
+    });
+
+    $("saveProductBtn").addEventListener("click", saveProduct);
+    $("resetProductFormBtn").addEventListener("click", resetProductForm);
+    $("productTableSearch").addEventListener("input", renderProductsTable);
+    $("productsBody").addEventListener("click", e => {
+      const editId = e.target.getAttribute("data-edit-product");
+      const delId = e.target.getAttribute("data-delete-product");
+      if(editId) editProduct(editId);
+      if(delId) deleteProduct(delId);
+    });
+
+    $("saveStoreBtn").addEventListener("click", saveStore);
+    $("resetStoreFormBtn").addEventListener("click", resetStoreForm);
+    $("storesBody").addEventListener("click", e => {
+      const editId = e.target.getAttribute("data-edit-store");
+      const delId = e.target.getAttribute("data-delete-store");
+      if(editId) editStore(editId);
+      if(delId) deleteStore(delId);
+    });
+
+    ["histYear","histMonth","histStore","histProduct","histCalcOnly","histSearch"].forEach(id => {
+      $(id).addEventListener(id === "histSearch" ? "input" : "change", () => { renderHistory(); renderSummary(); });
+    });
+    $("clearHistoryFilterBtn").addEventListener("click", clearHistoryFilter);
+    $("exportFilteredBtn").addEventListener("click", () => exportExcel("filtered"));
+    $("deleteSelectedHistoryBtn").addEventListener("click", deleteSelectedHistory);
+    $("selectAllHistory").addEventListener("change", () => {
+      const checked = $("selectAllHistory").checked;
+      document.querySelectorAll("[data-history-select]").forEach(el => el.checked = checked);
+    });
+    $("historyBody").addEventListener("click", e => {
+      const saveId = e.target.getAttribute("data-save-history");
+      const deleteId = e.target.getAttribute("data-delete-history");
+      if(saveId) saveHistoryRow(saveId);
+      if(deleteId) deleteHistoryRow(deleteId);
+    });
+
+    $("importJsonInput").addEventListener("change", e => {
+      if(e.target.files && e.target.files[0]) importJson(e.target.files[0]);
+      e.target.value = "";
+    });
+    $("resetSampleBtn").addEventListener("click", resetSample);
+    $("clearAllBtn").addEventListener("click", clearAll);
+  }
+
+  setDefaultControls();
+  resetProductForm();
+  resetStoreForm();
+  bindEvents();
+  renderAll();
+})();
+</script>
+</body>
+</html>

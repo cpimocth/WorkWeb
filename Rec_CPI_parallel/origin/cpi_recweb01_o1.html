@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ระบบบันทึกข้อมูลและประมวลผล</title>
+    
+    <!-- AdminLTE & Dependencies CSS via CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@2.4.18/dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@2.4.18/dist/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- SheetJS (Library สำหรับสร้างและดาวน์โหลดไฟล์ Excel) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <style>
+        body { font-family: 'Tahoma', sans-serif; }
+        .main-header .logo { font-size: 16px; font-weight: bold; }
+    </style>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+
+  <!-- Header Header -->
+  <header class="main-header">
+    <a href="#" class="logo">
+      <span class="logo-mini"><b>SYS</b></span>
+      <span class="logo-lg"><b>ระบบประมวลผลข้อมูล</b></span>
+    </a>
+    <nav class="navbar navbar-static-top">
+      <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+          <li class="dropdown user user-menu">
+            <a href="#"><span class="hidden-xs"><i class="fa fa-user"></i> ผู้ใช้งานระบบ</span></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Left Sidebar -->
+  <aside class="main-sidebar">
+    <section class="sidebar">
+      <ul class="sidebar-menu tree" data-widget="tree">
+        <li class="header">เมนูหลัก</li>
+        <li class="active treeview">
+          <a href="#">
+            <i class="fa fa-edit"></i> <span>1. บันทึกข้อมูล</span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+          </a>
+          <ul class="treeview-menu">
+            <li class="active"><a href="#"><i class="fa fa-circle-o"></i> 1.1 แบบฟอร์มบันทึกราคา</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-file-excel-o"></i> <span>2. ออกรายงาน</span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="#" onclick="exportToExcel()"><i class="fa fa-circle-o"></i> 2.1 ส่งออกเป็น Excel</a></li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+  </aside>
+
+  <!-- Content Wrapper -->
+  <div class="content-wrapper" style="min-height: 900px;">
+    <section class="content-header">
+      <h1>
+        บันทึกข้อมูลราคาสินค้า
+        <small>กรอกข้อมูลลงในฟอร์มเพื่อบันทึกและ Export ลงไฟล์ Excel</small>
+      </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        
+        <!-- Form Section -->
+        <div class="col-md-4">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title"><i class="fa fa-plus-circle"></i> แบบฟอร์มกรอกข้อมูล</h3>
+            </div>
+            <form id="dataForm">
+              <div class="box-body">
+                <div class="form-group">
+                  <label>วันที่บันทึก</label>
+                  <input type="date" id="docDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>หมวดหมู่ / จังหวัด</label>
+                  <select id="province" class="form-control">
+                    <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
+                    <option value="เชียงใหม่">เชียงใหม่</option>
+                    <option value="ขอนแก่น">ขอนแก่น</option>
+                    <option value="ชลบุรี">ชลบุรี</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>ชื่อรายการ / รายการสินค้า</label>
+                  <input type="text" id="itemName" class="form-control" placeholder="เช่น หมูเนื้อแดง, น้ำมันพืช" required>
+                </div>
+                <div class="form-group">
+                  <label>ราคา (บาท)</label>
+                  <input type="number" id="price" class="form-control" placeholder="0.00" step="0.01" required>
+                </div>
+                <div class="form-group">
+                  <label>ผู้บันทึก</label>
+                  <input type="text" id="recorder" class="form-control" placeholder="ชื่อผู้ลงข้อมูล" required>
+                </div>
+              </div>
+              <div class="box-footer">
+                <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-save"></i> เพิ่มลงตาราง</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Table Display Section -->
+        <div class="col-md-8">
+          <div class="box box-info">
+            <div class="box-header with-border">
+              <h3 class="box-title"><i class="fa fa-table"></i> รายการที่บันทึกแล้วในเครื่อง</h3>
+              <div class="box-tools pull-right">
+                <button onclick="exportToExcel()" class="btn btn-success btn-sm"><i class="fa fa-file-excel-o"></i> Download Excel (.xlsx)</button>
+              </div>
+            </div>
+            <div class="box-body table-responsive">
+              <table class="table table-bordered table-striped" id="dataTable">
+                <thead>
+                  <tr class="bg-gray">
+                    <th style="width: 50px;">#</th>
+                    <th>วันที่</th>
+                    <th>จังหวัด</th>
+                    <th>รายการสินค้า</th>
+                    <th>ราคา (บาท)</th>
+                    <th>ผู้บันทึก</th>
+                    <th style="width: 60px;">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody">
+                  <!-- Data rows will be added here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <footer class="main-footer">
+    <div class="pull-right hidden-xs"><b>Version</b> 1.0.0</div>
+    <strong>ระบบบันทึกข้อมูลและประมวลผล &copy; 2026</strong>
+  </footer>
+</div>
+
+<!-- JS Libraries -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@2.4.18/dist/js/adminlte.min.js"></script>
+
+<script>
+  let recordList = [];
+
+  // Submit Form Function
+  $('#dataForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    let newItem = {
+      id: recordList.length + 1,
+      date: $('#docDate').val(),
+      province: $('#province').val(),
+      item: $('#itemName').val(),
+      price: parseFloat($('#price').val()).toFixed(2),
+      recorder: $('#recorder').val()
+    };
+
+    recordList.push(newItem);
+    renderTable();
+    
+    // Clear inputs except recorder
+    $('#itemName').val('');
+    $('#price').val('');
+  });
+
+  // Render Table
+  function renderTable() {
+    let html = '';
+    recordList.forEach((item, index) => {
+      html += `<tr>
+        <td>${index + 1}</td>
+        <td>${item.date}</td>
+        <td>${item.province}</td>
+        <td>${item.item}</td>
+        <td>${item.price}</td>
+        <td>${item.recorder}</td>
+        <td><button onclick="deleteRow(${index})" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button></td>
+      </tr>`;
+    });
+    $('#tableBody').html(html);
+  }
+
+  // Delete Row
+  function deleteRow(index) {
+    recordList.splice(index, 1);
+    renderTable();
+  }
+
+  // Export to Excel File (.xlsx)
+  function exportToExcel() {
+    if (recordList.length === 0) {
+      alert("ไม่มีข้อมูลในตารางสำหรับ Export กรุณากรอกข้อมูลก่อนครับ");
+      return;
+    }
+
+    // Prepare Data Array with Thai Headers
+    let excelData = recordList.map((item, idx) => ({
+      "ลำดับ": idx + 1,
+      "วันที่บันทึก": item.date,
+      "จังหวัด/หมวดหมู่": item.province,
+      "รายการสินค้า": item.item,
+      "ราคา (บาท)": parseFloat(item.price),
+      "ผู้บันทึก": item.recorder
+    }));
+
+    // Create Worksheet & Workbook
+    let worksheet = XLSX.utils.json_to_sheet(excelData);
+    let workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data_Record");
+
+    // Generate and Download File
+    let filename = `Data_Export_${new Date().toISOString().slice(0,10)}.xlsx`;
+    XLSX.writeFile(workbook, filename);
+  }
+</script>
+</body>
+</html>
